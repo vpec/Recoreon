@@ -25,8 +25,10 @@ import java.nio.file.Paths;
 import java.util.Date;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.es.SpanishAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
+import org.apache.lucene.document.LongPoint;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.queryparser.classic.QueryParser;
@@ -88,7 +90,7 @@ public class SearchFiles {
     
     IndexReader reader = DirectoryReader.open(FSDirectory.open(Paths.get(index)));
     IndexSearcher searcher = new IndexSearcher(reader);
-    Analyzer analyzer = new StandardAnalyzer();
+    Analyzer analyzer = new SpanishAnalyzer2();
 
     BufferedReader in = null;
     if (queries != null) {
@@ -174,17 +176,21 @@ public class SearchFiles {
       for (int i = start; i < end; i++) {
         if (raw) {                              // output raw format
           System.out.println("doc="+hits[i].doc+" score="+hits[i].score);
-          continue;
         }
-
-        Document doc = searcher.doc(hits[i].doc);
-        String path = doc.get("path");
-        if (path != null) {
-          System.out.println((i+1) + ". " + path);
-        } else {
-          System.out.println((i+1) + ". " + "No path for this document");
-        }
-                  
+        else {
+            Document doc = searcher.doc(hits[i].doc);
+            String path = doc.get("path");
+            String lastModified = doc.get("modified");
+            if (path != null) {
+            	System.out.println((i+1) + ". " + path);
+            	if(lastModified != null) {
+            		System.out.println("\t" + "modified: " + new Date(Long.parseLong(lastModified)));
+            	}
+            	
+            } else {
+              System.out.println((i+1) + ". " + "No path for this document");
+            }
+        }            
       }
 
       if (!interactive || end == 0) {

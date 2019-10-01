@@ -18,10 +18,12 @@ package org.apache.lucene.demo;
  */
 
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.es.SpanishAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.LongPoint;
+import org.apache.lucene.document.StoredField;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.IndexWriter;
@@ -30,6 +32,8 @@ import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -39,6 +43,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Paths;
 import java.util.Date;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 /** Index all text files under a directory.
  * <p>
@@ -86,7 +93,7 @@ public class IndexFiles {
       System.out.println("Indexing to directory '" + indexPath + "'...");
 
       Directory dir = FSDirectory.open(Paths.get(indexPath));
-      Analyzer analyzer = new StandardAnalyzer();
+      Analyzer analyzer = new SpanishAnalyzer2();
       IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
 
       if (create) {
@@ -157,8 +164,11 @@ public class IndexFiles {
       } else {
 
         FileInputStream fis;
+        FileInputStream fisCopy;
         try {
           fis = new FileInputStream(file);
+          fisCopy = new FileInputStream(file);
+ 
         } catch (FileNotFoundException fnfe) {
           // at least on windows, some temporary files raise this exception with an "access denied" message
           // checking if the file can be read doesn't help
@@ -184,13 +194,44 @@ public class IndexFiles {
           // year/month/day/hour/minutes/seconds, down the resolution you require.
           // For example the long value 2011021714 would mean
           // February 17, 2011, 2-3 PM.
-          doc.add(new LongPoint("modified", file.lastModified()));
-
+          doc.add(new StoredField("modified", file.lastModified()));
+          
           // Add the contents of the file to a field named "contents".  Specify a Reader,
           // so that the text of the file is tokenized and indexed, but not stored.
           // Note that FileReader expects the file to be in UTF-8 encoding.
           // If that's not the case searching for special characters will fail.
-          doc.add(new TextField("contents", new BufferedReader(new InputStreamReader(fis, "UTF-8"))));
+          //doc.add(new TextField("contents", new BufferedReader(new InputStreamReader(fis, "UTF-8")))); //OLD
+          DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+          try {
+              DocumentBuilder builder = factory.newDocumentBuilder();
+              org.w3c.dom.Document document = builder.parse(fisCopy);
+              Element element = document.getDocumentElement();
+              NodeList nodes = element.getChildNodes();
+
+              String id;
+              for (int i = 0; i < nodes.getLength(); i++) {
+                 id = nodes.item(i).getNodeName();
+                 // TextFields
+                 if(id.contentEquals("dc:title") || 
+                		 id.contentEquals("dc:subject") || 
+                		 id.contentEquals("dc:description") || 
+                		 id.contentEquals("dc:creator") || 
+                		 id.contentEquals("dc:publisher")) {
+                	 doc.add(new TextField(id, nodes.item(i).getTextContent(), Field.Store.YES));
+                 }
+                 // StringFields
+                 if(id.contentEquals("dc:identifier") || 
+                		 id.contentEquals("dc:type") || 
+                		 id.contentEquals("dc:format") || 
+                		 id.contentEquals("dc:language")) {
+                	 doc.add(new StringField(id, nodes.item(i).getTextContent(), Field.Store.YES));
+                 }
+              }
+          }
+          catch(Exception e) {
+        	  System.out.println(e.toString());
+          }
+          doc.add(new TextField("title", new BufferedReader(new InputStreamReader(fis, "UTF-8"))));
 
           if (writer.getConfig().getOpenMode() == OpenMode.CREATE) {
             // New index, so we just add the document (no old document can be there):
@@ -206,6 +247,7 @@ public class IndexFiles {
           
         } finally {
           fis.close();
+          fisCopy.close();
         }
       }
     }
