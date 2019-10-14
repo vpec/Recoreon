@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<informationNeeds>
+    <informationNeed>
+        <identifier>1</identifier>
+        <text>¿Qué tratamientos alternativos con eficacia probada existen para
+        pacientes con tumores malignos?</text>
+    </informationNeed>
+    <informationNeed>
+        <identifier>2</identifier>
+        <text>¿Qué articulos existen sobre TSS (Time Sharing System), un sistema
+        operativo para procesadores IBM?</text>
+    </informationNeed>
+    <informationNeed>
+        <identifier>3</identifier>
+        <text>Estoy interesado en estudios sobre las diferencias en los hábitos alimentarios
+        de las personas según factores sociales y demográficos.</text>
+    </informationNeed>
+    <informationNeed>
+        <identifier>4</identifier>
+        <text>Estoy interesado en mecanismos de comunicación entre procesos en
+        entornos distribuidos. Preferiría ver descripciones de mecanismos completos,
+        con o sin implementaciones, pero no trabajos teóricos sobre un problema
+        abstracto. Remote procedure calls y message-passing son ejemplos de mis
+        intereses.</text>
+    </informationNeed>
+    <informationNeed>
+        <identifier>5</identifier>
+        <text>Estoy interesado en mecanismos de comunicación entre procesos en
+        entornos distribuidos. Preferiría ver descripciones de mecanismos completos,
+        con o sin implementaciones, pero no trabajos teóricos sobre un problema
+        abstracto. Remote procedure calls y message-passing son ejemplos de mis
+        intereses.</text>
+    </informationNeed>
+</informationNeeds>
