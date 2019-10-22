@@ -93,7 +93,7 @@ public class IndexFiles {
       System.out.println("Indexing to directory '" + indexPath + "'...");
 
       Directory dir = FSDirectory.open(Paths.get(indexPath));
-      Analyzer analyzer = new SpanishAnalyzer2();
+      Analyzer analyzer = new StandardAnalyzer();
       IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
 
       if (create) {
@@ -218,13 +218,21 @@ public class IndexFiles {
                 		 id.contentEquals("dc:creator") || 
                 		 id.contentEquals("dc:publisher")) {
                 	 doc.add(new TextField(id, nodes.item(i).getTextContent(), Field.Store.YES));
-                 }
+                 } 
                  // StringFields
-                 if(id.contentEquals("dc:identifier") || 
+                 else if(id.contentEquals("dc:identifier") || 
                 		 id.contentEquals("dc:type") || 
                 		 id.contentEquals("dc:format") || 
                 		 id.contentEquals("dc:language")) {
                 	 doc.add(new StringField(id, nodes.item(i).getTextContent(), Field.Store.YES));
+                 }
+                 // Spatial lower corner coordinates 
+                 else if (id.contentEquals("ows:LowerCorner")) {
+                	 System.out.println(nodes.item(i).getTextContent());
+                 }
+                 // Spatial upper corner coordinates 
+                 else if (id.contentEquals("ows:UpperCorner")) {
+                	 System.out.println(nodes.item(i).getTextContent());
                  }
               }
           }
