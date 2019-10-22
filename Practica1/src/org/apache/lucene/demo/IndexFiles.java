@@ -21,6 +21,7 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.es.SpanishAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
+import org.apache.lucene.document.DoublePoint;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.LongPoint;
 import org.apache.lucene.document.StoredField;
@@ -227,12 +228,13 @@ public class IndexFiles {
                 	 doc.add(new StringField(id, nodes.item(i).getTextContent(), Field.Store.YES));
                  }
                  // Spatial lower corner coordinates 
-                 else if (id.contentEquals("ows:LowerCorner")) {
-                	 System.out.println(nodes.item(i).getTextContent());
-                 }
-                 // Spatial upper corner coordinates 
-                 else if (id.contentEquals("ows:UpperCorner")) {
-                	 System.out.println(nodes.item(i).getTextContent());
+                 else if (id.contentEquals("ows:BoundingBox")) {
+                	 String[] coordinates = nodes.item(i).getTextContent().split("\\s+");
+                	 // Store the coordinates
+                     doc.add(new StoredField("west", coordinates[1]));
+                     doc.add(new StoredField("south", coordinates[2]));
+                     doc.add(new StoredField("east", coordinates[3]));
+                     doc.add(new StoredField("north", coordinates[4]));              
                  }
               }
           }
