@@ -46,35 +46,156 @@ public class SearchFiles2 {
   /** Simple command-line based search demo. */
   public static void main(String[] args) throws Exception {
 	  
-	  Double west = -180.0, east = 180.0, north = 90.0, south = -90.0;
-	  
-	  // Xmin <= east
-	  Query westRangeQuery = DoublePoint.newRangeQuery("west", Double.NEGATIVE_INFINITY, east);
-	  // Xmax >= west
-	  Query eastRangeQuery = DoublePoint.newRangeQuery("east", Double.NEGATIVE_INFINITY, west);
-	  // Ymin <= north
-	  Query southRangeQuery = DoublePoint.newRangeQuery("south", Double.NEGATIVE_INFINITY, north);
-	  // Ymax >= south
-	  Query northRangeQuery = DoublePoint.newRangeQuery("north", Double.NEGATIVE_INFINITY, south);
-
-	  // Construction 
-	  BooleanQuery query = new BooleanQuery.Builder()
-			  .add(westRangeQuery, BooleanClause.Occur.MUST)
-			  .add(eastRangeQuery, BooleanClause.Occur.MUST)
-			  .add(southRangeQuery, BooleanClause.Occur.MUST)
-			  .add(northRangeQuery, BooleanClause.Occur.MUST).build();
-
-	  
-	  IndexReader reader = DirectoryReader.open(FSDirectory.open(Paths.get("index")));
-	  IndexSearcher searcher = new IndexSearcher(reader);
-	  
-	 // Collect enough docs to show 5 pages
-	 TopDocs results = searcher.search(query, 5 * 10);
-	 ScoreDoc[] hits = results.scoreDocs;
+	  String usage =
+	      "Usage:\tjava org.apache.lucene.demo.SearchFiles [-index dir] [-field f] [-repeat n] [-queries file] [-query string] [-raw] [-paging hitsPerPage]\n\nSee http://lucene.apache.org/core/4_1_0/demo/ for details.";
+	    if (args.length > 0 && ("-h".equals(args[0]) || "-help".equals(args[0]))) {
+	      System.out.println(usage);
+	      System.exit(0);
+	    }
+	
+	    String index = "index";
+	    String field = "contents";
+	    String queries = null;
+	    int repeat = 0;
+	    boolean raw = false;
+	    String queryString = null;
+	    int hitsPerPage = 10;
 	    
-	 int numTotalHits = (int)results.totalHits;
-	 System.out.println(numTotalHits + " total matching documents");
+	    for(int i = 0;i < args.length;i++) {
+	      if ("-index".equals(args[i])) {
+	        index = args[i+1];
+	        i++;
+	      } else if ("-field".equals(args[i])) {
+	        field = args[i+1];
+	        i++;
+	      } else if ("-queries".equals(args[i])) {
+	        queries = args[i+1];
+	        i++;
+	      } else if ("-query".equals(args[i])) {
+	        queryString = args[i+1];
+	        i++;
+	      } else if ("-repeat".equals(args[i])) {
+	        repeat = Integer.parseInt(args[i+1]);
+	        i++;
+	      } else if ("-raw".equals(args[i])) {
+	        raw = true;
+	      } else if ("-paging".equals(args[i])) {
+	        hitsPerPage = Integer.parseInt(args[i+1]);
+	        if (hitsPerPage <= 0) {
+	          System.err.println("There must be at least 1 hit per page.");
+	          System.exit(1);
+	        }
+	        i++;
+	      }
+	    }
+	    
+	    IndexReader reader = DirectoryReader.open(FSDirectory.open(Paths.get(index)));
+	    IndexSearcher searcher = new IndexSearcher(reader);
+	    Analyzer analyzer = new SpanishAnalyzer2();
+	
+	    
+//	    Double west = -180.0, east = 180.0, north = 90.0, south = -90.0;
+	    Double west = -160.0, east = 180.0, north = 90.0, south = -90.0;
+		  
+		  // Xmin <= east
+		  Query westRangeQuery = DoublePoint.newRangeQuery("west", Double.NEGATIVE_INFINITY, east);
+		  // Xmax >= west
+		  Query eastRangeQuery = DoublePoint.newRangeQuery("east", Double.POSITIVE_INFINITY, west);
+		  // Ymin <= north
+		  Query southRangeQuery = DoublePoint.newRangeQuery("south", Double.NEGATIVE_INFINITY, north);
+		  // Ymax >= south
+		  Query northRangeQuery = DoublePoint.newRangeQuery("north", Double.POSITIVE_INFINITY, south);
 
+		  // Construction 
+//		  BooleanQuery queryBool = new BooleanQuery.Builder()
+//				  .add(westRangeQuery, BooleanClause.Occur.MUST)
+//				  .add(eastRangeQuery, BooleanClause.Occur.MUST)
+//				  .add(southRangeQuery, BooleanClause.Occur.MUST)
+//				  .add(northRangeQuery, BooleanClause.Occur.MUST).build();
+		  
+		  BooleanQuery queryBool = new BooleanQuery.Builder()
+				  .add(westRangeQuery, BooleanClause.Occur.MUST).build();
+		  
+	
+	      //doPagingSearch(in, searcher, queryBool, hitsPerPage, raw, queries == null && queryString == null);
+	
+		//IndexReader reader = DirectoryReader.open(FSDirectory.open(Paths.get("index")));
+		  //IndexSearcher searcher = new IndexSearcher(reader);
+		  
+		 // Collect enough docs to show 5 pages
+		 TopDocs results = searcher.search(queryBool, 5 * 10);
+		 ScoreDoc[] hits = results.scoreDocs;
+		    
+		 int numTotalHits = (int)results.totalHits;
+		 System.out.println(numTotalHits + " total matching documents");
+	    
+		 int start = 0;
+		    int end = Math.min(numTotalHits, hitsPerPage);
+		        
+		    while (true) {
+		      if (end > hits.length) {
+		        hits = searcher.search(queryBool, numTotalHits).scoreDocs;
+		      }
+		      
+		      end = Math.min(hits.length, start + hitsPerPage);
+		      
+		      for (int i = start; i < end; i++) {
+		        if (raw) {                              // output raw format
+		          System.out.println("doc="+hits[i].doc+" score="+hits[i].score);
+		        }
+		        else {
+		            Document doc = searcher.doc(hits[i].doc);
+		            String path = doc.get("path");
+		            String lastModified = doc.get("modified");
+		            if (path != null) {
+		            	System.out.println((i+1) + ". " + path);
+		            	if(lastModified != null) {
+		            		System.out.println("\t" + "modified: " + new Date(Long.parseLong(lastModified)));
+		            	}
+		            	
+		            } else {
+		              System.out.println((i+1) + ". " + "No path for this document");
+		            }
+		        }            
+		      }
+	    
+	    
+	    
+	    BufferedReader in = null;
+	    if (queries != null) {
+	      in = new BufferedReader(new InputStreamReader(new FileInputStream(queries), "UTF-8"));
+	    } else {
+	      in = new BufferedReader(new InputStreamReader(System.in, "UTF-8"));
+	    }
+	    QueryParser parser = new QueryParser(field, analyzer);
+	    while (true) {
+	      if (queries == null && queryString == null) {                        // prompt the user
+	        System.out.println("Enter query: ");
+	      }
+	
+	      String line = queryString != null ? queryString : in.readLine();
+	
+	      if (line == null || line.length() == -1) {
+	        break;
+	      }
+	
+	      line = line.trim();
+	      if (line.length() == 0) {
+	        break;
+	      }
+	      
+	      Query query = parser.parse(line);
+	      System.out.println("Searching for: " + query.toString(field));
+	   }
+
+		  
+		 
+	      if (queryString != null) {
+	        break;
+	      }
+	    }
+	    reader.close();
+	  
   }
 	  
 	
