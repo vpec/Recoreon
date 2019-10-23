@@ -231,10 +231,18 @@ public class IndexFiles {
                  else if (id.contentEquals("ows:BoundingBox")) {
                 	 String[] coordinates = nodes.item(i).getTextContent().split("\\s+");
                 	 // Store the coordinates
-                     doc.add(new StoredField("west", coordinates[1]));
-                     doc.add(new StoredField("south", coordinates[2]));
-                     doc.add(new StoredField("east", coordinates[3]));
-                     doc.add(new StoredField("north", coordinates[4]));              
+//                     doc.add(new StoredField("west", coordinates[1]));
+//                     doc.add(new StoredField("south", coordinates[2]));
+//                     doc.add(new StoredField("east", coordinates[3]));
+//                     doc.add(new StoredField("north", coordinates[4]));
+                	 DoublePoint westField = new DoublePoint("west", Double.parseDouble(coordinates[1]));
+                	 DoublePoint southField = new DoublePoint("south", Double.parseDouble(coordinates[2]));
+                	 DoublePoint eastField = new DoublePoint("east", Double.parseDouble(coordinates[3]));
+                	 DoublePoint northField = new DoublePoint("north", Double.parseDouble(coordinates[4]));
+                	 doc.add(westField);
+                	 doc.add(southField);
+                	 doc.add(eastField);
+                	 doc.add(northField);
                  }
               }
           }
