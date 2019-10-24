@@ -25,6 +25,7 @@ import java.nio.file.Paths;
 import java.util.Date;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.es.SpanishAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.DoublePoint;
 import org.apache.lucene.index.DirectoryReader;
@@ -52,7 +53,134 @@ public class SearchFiles2 {
 	      System.out.println(usage);
 	      System.exit(0);
 	    }
+	    String index = "index";
+	    String field = "contents";
+	    String queries = null;
+	    int repeat = 0;
+	    boolean raw = false;
+	    String queryString = null;
+	    int hitsPerPage = 10;
+	    
+	    for(int i = 0;i < args.length;i++) {
+	      if ("-index".equals(args[i])) {
+	        index = args[i+1];
+	        i++;
+	      } else if ("-field".equals(args[i])) {
+	        field = args[i+1];
+	        i++;
+	      } else if ("-queries".equals(args[i])) {
+	        queries = args[i+1];
+	        i++;
+	      } else if ("-query".equals(args[i])) {
+	        queryString = args[i+1];
+	        i++;
+	      } else if ("-repeat".equals(args[i])) {
+	        repeat = Integer.parseInt(args[i+1]);
+	        i++;
+	      } else if ("-raw".equals(args[i])) {
+	        raw = true;
+	      } else if ("-paging".equals(args[i])) {
+	        hitsPerPage = Integer.parseInt(args[i+1]);
+	        if (hitsPerPage <= 0) {
+	          System.err.println("There must be at least 1 hit per page.");
+	          System.exit(1);
+	        }
+	        i++;
+	      }
+	    }
+	    
+	    IndexReader reader = DirectoryReader.open(FSDirectory.open(Paths.get(index)));
+	    IndexSearcher searcher = new IndexSearcher(reader);
+	    Analyzer analyzer = new SpanishAnalyzer();
+	    
+	    BufferedReader in = null;
+	    if (queries != null) {
+	      in = new BufferedReader(new InputStreamReader(new FileInputStream(queries), "UTF-8"));
+	    } else {
+	      in = new BufferedReader(new InputStreamReader(System.in, "UTF-8"));
+	    }
+	    QueryParser parser = new QueryParser(field, analyzer);
+	    BooleanQuery.Builder finalQuery = new BooleanQuery.Builder();
+	    boolean atLeastOne = false;
+	    while (true) {
+	      if (queries == null && queryString == null) {                        // prompt the user
+	        System.out.println("Enter query: ");
+	      }
+
+	      String line = queryString != null ? queryString : in.readLine();
+
+	      if (line == null || line.length() == -1) {
+	        break;
+	      }
+
+	      line = line.trim();
+	      if (line.length() == 0) {
+	    	  if(!atLeastOne) {
+	    		  break;
+	    	  }
+	    	  // Execute query
+	    	  Query querySearch = finalQuery.build();
+		      System.out.println("Searching for: " + querySearch.toString(field));
+		            
+		      if (repeat > 0) {                           // repeat & time as benchmark
+		        Date start = new Date();
+		        for (int i = 0; i < repeat; i++) {
+		          searcher.search(querySearch, 100);
+		        }
+		        Date end = new Date();
+		        System.out.println("Time: "+(end.getTime()-start.getTime())+"ms");
+		      }
 	
+		      doPagingSearch(in, searcher, querySearch, hitsPerPage, raw, queries == null && queryString == null);
+		      
+		      atLeastOne = false;
+		      
+		      if (queryString != null) {
+		        break;
+		      }
+	      }
+	      else if (line.equals(":q")) {
+		    break;
+		  }
+	      else {
+	    	  atLeastOne = true;
+	    	  Double west, east, south, north;
+		      if(line.split(":")[0].equals("spatial")) {
+		    	  west = Double.parseDouble(line.substring(line.indexOf(':') + 1, line.indexOf(',')));
+		    	  line = line.substring(line.indexOf(',') + 1, line.length());
+		    	  east = Double.parseDouble(line.substring(0, line.indexOf(',')));
+		    	  line = line.substring(line.indexOf(',') + 1, line.length()); 	  	    	  
+		    	  south = Double.parseDouble(line.substring(0, line.indexOf(',')));
+		    	  line = line.substring(line.indexOf(',') + 1, line.length());
+		    	  north = Double.parseDouble(line.substring(0, line.length()));
+		    	  
+		    	  // Xmin <= east
+				  Query westRangeQuery = DoublePoint.newRangeQuery("west", Double.NEGATIVE_INFINITY, east);
+				  // Xmax >= west
+				  Query eastRangeQuery = DoublePoint.newRangeQuery("east", west, Double.POSITIVE_INFINITY);
+				  // Ymin <= north
+				  Query southRangeQuery = DoublePoint.newRangeQuery("south", Double.NEGATIVE_INFINITY, north);
+				  // Ymax >= south
+				  Query northRangeQuery = DoublePoint.newRangeQuery("north", south, Double.POSITIVE_INFINITY);
+
+				  // Construction 
+				  BooleanQuery queryBool = new BooleanQuery.Builder()
+						  .add(westRangeQuery, BooleanClause.Occur.MUST)
+						  .add(eastRangeQuery, BooleanClause.Occur.MUST)
+						  .add(southRangeQuery, BooleanClause.Occur.MUST)
+						  .add(northRangeQuery, BooleanClause.Occur.MUST).build();
+				  
+				  finalQuery.add(queryBool, BooleanClause.Occur.SHOULD);
+		      }
+		      else {
+		    	  finalQuery.add(parser.parse(line), BooleanClause.Occur.SHOULD);
+		      }
+	      }
+	      
+	    }
+	    reader.close();
+	  }
+	/*
 	    String index = "index";
 	    String field = "contents";
 	    String queries = null;
@@ -92,6 +220,41 @@ public class SearchFiles2 {
 	    IndexReader reader = DirectoryReader.open(FSDirectory.open(Paths.get(index)));
 	    IndexSearcher searcher = new IndexSearcher(reader);
 	    Analyzer analyzer = new SpanishAnalyzer2();
+	    
+	    BufferedReader in = null;
+	    if (queries != null) {
+	      in = new BufferedReader(new InputStreamReader(new FileInputStream(queries), "UTF-8"));
+	    } else {
+	      in = new BufferedReader(new InputStreamReader(System.in, "UTF-8"));
+	    }
+	    QueryParser parser = new QueryParser(field, analyzer);
+	    while (true) {
+	      if (queries == null && queryString == null) {                        // prompt the user
+	        System.out.println("Enter query: ");
+	      }
+
+	      String line = queryString != null ? queryString : in.readLine();
+
+	      if (line == null || line.length() == -1) {
+	        break;
+	      }
+
+	      line = line.trim();
+	      if (line.length() == 0) {
+	        break;
+	      }
+	      
+	      Query query = parser.parse(line);
+	      System.out.println("Searching for: " + query.toString(field));
+	            
+	      if (repeat > 0) {                           // repeat & time as benchmark
+	        Date start = new Date();
+	        for (int i = 0; i < repeat; i++) {
+	          searcher.search(query, 100);
+	        }
+	        Date end = new Date();
+	        System.out.println("Time: "+(end.getTime()-start.getTime())+"ms");
+	      }
 	
 	    
 	    Double west = -180.0, east = 180.0, north = 90.0, south = -90.0;
@@ -133,7 +296,89 @@ public class SearchFiles2 {
 		        hits = searcher.search(queryBool, numTotalHits).scoreDocs;
 		      }
 		      
-		      end = Math.min(hits.length, start + hitsPerPage);
+	String index = "index";
+    String field = "contents";
+    String queries = null;
+    int repeat = 0;
+    boolean raw = false;
+    String queryString = null;
+    int hitsPerPage = 10;
+    
+    for(int i = 0;i < args.length;i++) {
+      if ("-index".equals(args[i])) {
+        index = args[i+1];
+        i++;
+      } else if ("-field".equals(args[i])) {
+        field = args[i+1];
+        i++;
+      } else if ("-queries".equals(args[i])) {
+        queries = args[i+1];
+        i++;
+      } else if ("-query".equals(args[i])) {
+        queryString = args[i+1];
+        i++;
+      } else if ("-repeat".equals(args[i])) {
+        repeat = Integer.parseInt(args[i+1]);
+        i++;
+      } else if ("-raw".equals(args[i])) {
+        raw = true;
+      } else if ("-paging".equals(args[i])) {
+        hitsPerPage = Integer.parseInt(args[i+1]);
+        if (hitsPerPage <= 0) {
+          System.err.println("There must be at least 1 hit per page.");
+          System.exit(1);
+        }
+        i++;
+      }
+    }
+    
+    IndexReader reader = DirectoryReader.open(FSDirectory.open(Paths.get(index)));
+    IndexSearcher searcher = new IndexSearcher(reader);
+    Analyzer analyzer = new SpanishAnalyzer2();
+
+    BufferedReader in = null;
+    if (queries != null) {
+      in = new BufferedReader(new InputStreamReader(new FileInputStream(queries), "UTF-8"));
+    } else {
+      in = new BufferedReader(new InputStreamReader(System.in, "UTF-8"));
+    }
+    QueryParser parser = new QueryParser(field, analyzer);
+    while (true) {
+      if (queries == null && queryString == null) {                        // prompt the user
+        System.out.println("Enter query: ");
+      }
+
+      String line = queryString != null ? queryString : in.readLine();
+
+      if (line == null || line.length() == -1) {
+        break;
+      }
+
+      line = line.trim();
+      if (line.length() == 0) {
+        break;
+      }
+      
+      Query query = parser.parse(line);
+      System.out.println("Searching for: " + query.toString(field));
+            
+      if (repeat > 0) {                           // repeat & time as benchmark
+        Date start = new Date();
+        for (int i = 0; i < repeat; i++) {
+          searcher.search(query, 100);
+        }
+        Date end = new Date();
+        System.out.println("Time: "+(end.getTime()-start.getTime())+"ms");
+      }
+
+      doPagingSearch(in, searcher, query, hitsPerPage, raw, queries == null && queryString == null);
+
+      if (queryString != null) {
+        break;
+      }
+    }
+    reader.close();
+  }	      end = Math.min(hits.length, start + hitsPerPage);
 		      
 		      for (int i = start; i < end; i++) {
 		        if (raw) {                              // output raw format
@@ -154,35 +399,6 @@ public class SearchFiles2 {
 		            }
 		        }            
 		      }
-	    
-	    
-	    
-	    BufferedReader in = null;
-	    if (queries != null) {
-	      in = new BufferedReader(new InputStreamReader(new FileInputStream(queries), "UTF-8"));
-	    } else {
-	      in = new BufferedReader(new InputStreamReader(System.in, "UTF-8"));
-	    }
-	    QueryParser parser = new QueryParser(field, analyzer);
-	    while (true) {
-	      if (queries == null && queryString == null) {                        // prompt the user
-	        System.out.println("Enter query: ");
-	      }
-	
-	      String line = queryString != null ? queryString : in.readLine();
-	
-	      if (line == null || line.length() == -1) {
-	        break;
-	      }
-	
-	      line = line.trim();
-	      if (line.length() == 0) {
-	        break;
-	      }
-	      
-	      Query query = parser.parse(line);
-	      System.out.println("Searching for: " + query.toString(field));
-	   }
 
 		  
 		 
@@ -193,6 +409,8 @@ public class SearchFiles2 {
 	    reader.close();
 	  
   }
+  
+  */
 	  
 	
 
