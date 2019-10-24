@@ -94,27 +94,23 @@ public class SearchFiles2 {
 	    Analyzer analyzer = new SpanishAnalyzer2();
 	
 	    
-//	    Double west = -180.0, east = 180.0, north = 90.0, south = -90.0;
-	    Double west = -160.0, east = 180.0, north = 90.0, south = -90.0;
+	    Double west = -180.0, east = 180.0, north = 90.0, south = -90.0;
 		  
 		  // Xmin <= east
 		  Query westRangeQuery = DoublePoint.newRangeQuery("west", Double.NEGATIVE_INFINITY, east);
 		  // Xmax >= west
-		  Query eastRangeQuery = DoublePoint.newRangeQuery("east", Double.POSITIVE_INFINITY, west);
+		  Query eastRangeQuery = DoublePoint.newRangeQuery("east", west, Double.POSITIVE_INFINITY);
 		  // Ymin <= north
 		  Query southRangeQuery = DoublePoint.newRangeQuery("south", Double.NEGATIVE_INFINITY, north);
 		  // Ymax >= south
-		  Query northRangeQuery = DoublePoint.newRangeQuery("north", Double.POSITIVE_INFINITY, south);
+		  Query northRangeQuery = DoublePoint.newRangeQuery("north", south, Double.POSITIVE_INFINITY);
 
 		  // Construction 
-//		  BooleanQuery queryBool = new BooleanQuery.Builder()
-//				  .add(westRangeQuery, BooleanClause.Occur.MUST)
-//				  .add(eastRangeQuery, BooleanClause.Occur.MUST)
-//				  .add(southRangeQuery, BooleanClause.Occur.MUST)
-//				  .add(northRangeQuery, BooleanClause.Occur.MUST).build();
-		  
 		  BooleanQuery queryBool = new BooleanQuery.Builder()
-				  .add(westRangeQuery, BooleanClause.Occur.MUST).build();
+				  .add(westRangeQuery, BooleanClause.Occur.MUST)
+				  .add(eastRangeQuery, BooleanClause.Occur.MUST)
+				  .add(southRangeQuery, BooleanClause.Occur.MUST)
+				  .add(northRangeQuery, BooleanClause.Occur.MUST).build();
 		  
 	
 	      //doPagingSearch(in, searcher, queryBool, hitsPerPage, raw, queries == null && queryString == null);
