@@ -218,6 +218,7 @@ public class IndexFiles {
                 		 id.contentEquals("dc:description") || 
                 		 id.contentEquals("dc:creator") || 
                 		 id.contentEquals("dc:publisher")) {
+                	 id = id.substring(id.indexOf(":") + 1, id.length());
                 	 doc.add(new TextField(id, nodes.item(i).getTextContent(), Field.Store.YES));
                  } 
                  // StringFields
@@ -225,16 +226,13 @@ public class IndexFiles {
                 		 id.contentEquals("dc:type") || 
                 		 id.contentEquals("dc:format") || 
                 		 id.contentEquals("dc:language")) {
+                	 id = id.substring(id.indexOf(":") + 1, id.length());
                 	 doc.add(new StringField(id, nodes.item(i).getTextContent(), Field.Store.YES));
                  }
                  // Spatial lower corner coordinates 
                  else if (id.contentEquals("ows:BoundingBox")) {
                 	 String[] coordinates = nodes.item(i).getTextContent().split("\\s+");
                 	 // Store the coordinates
-//                     doc.add(new StoredField("west", coordinates[1]));
-//                     doc.add(new StoredField("south", coordinates[2]));
-//                     doc.add(new StoredField("east", coordinates[3]));
-//                     doc.add(new StoredField("north", coordinates[4]));
                 	 DoublePoint westField = new DoublePoint("west", Double.parseDouble(coordinates[1]));
                 	 DoublePoint southField = new DoublePoint("south", Double.parseDouble(coordinates[2]));
                 	 DoublePoint eastField = new DoublePoint("east", Double.parseDouble(coordinates[3]));
@@ -244,12 +242,16 @@ public class IndexFiles {
                 	 doc.add(eastField);
                 	 doc.add(northField);
                  }
+                 else if(id.contentEquals("dcterms:issued") || id.contentEquals("dcterms:created")){
+                	 id = id.substring(id.indexOf(":") + 1, id.length());
+                	 doc.add(new TextField(id, nodes.item(i).getTextContent().replace("-", ""), Field.Store.YES));	 
+                 }
               }
           }
           catch(Exception e) {
         	  System.out.println(e.toString());
           }
-          doc.add(new TextField("title", new BufferedReader(new InputStreamReader(fis, "UTF-8"))));
+          //doc.add(new TextField("title", new BufferedReader(new InputStreamReader(fis, "UTF-8"))));
 
           if (writer.getConfig().getOpenMode() == OpenMode.CREATE) {
             // New index, so we just add the document (no old document can be there):
