@@ -4,10 +4,15 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
+
+import javax.swing.text.html.HTMLDocument.Iterator;
 
 public class Evaluation {
 	
@@ -36,7 +41,16 @@ public class Evaluation {
 			System.err.println("Usage: " + usage);
 			System.exit(1);
 		}
+		
+		// Load data from qrels and results files
+		loadInputData(qrelsPath, resultsPath);
 
+		// Writes evaluation metrics to output file
+		evaluate(outputPath);
+
+	}
+	
+	private static void loadInputData(String qrelsPath, String resultsPath) {
 		File qrelsFile = new File(qrelsPath);
 		File resultsFile = new File(resultsPath);
 		try {
@@ -71,7 +85,49 @@ public class Evaluation {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	private static void evaluate(String outputPath) {
+		File outputFile = new File(outputPath);
+		FileWriter outputWriter;
+		try {
+			outputWriter = new FileWriter(outputFile);
+			PrintWriter pw = new PrintWriter(outputWriter);
 
+			for (Entry<String, List<JudgedDocument>> entry : qrelsMap.entrySet()) {
+			    //System.out.println("clave=" + entry.getKey() + ", valor=" + entry.getValue());
+			    pw.println("INFORMATION_NEED " + entry.getKey());
+			    pw.println("precision " + precision());
+			    pw.println("recall " + recall());
+			    pw.println("F1 " + f1balanced());
+			    pw.println("prec@10 " + precAt10());
+//			    pw.println("average_precision " + average_precision());
+//			    pw.println("interpolated_recall_precision " + average_precision());
+			    pw.println();
+			}
+			
+			outputWriter.close();
+						
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private static String precision() {
+		return "";
+	}
+	
+	private static String recall() {
+		return "";
+	}
+	
+	private static String f1balanced() {
+		return "";
+	}
+	
+	private static String precAt10() {
+		return "";
 	}
 
 }

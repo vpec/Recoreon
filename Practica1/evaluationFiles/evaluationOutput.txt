@@ -1,0 +1,12 @@
+INFORMATION_NEED 1
+precision 
+recall 
+F1 
+prec@10 
+
+INFORMATION_NEED 2
+precision 
+recall 
+F1 
+prec@10 
+
