@@ -16,9 +16,12 @@ import javax.swing.text.html.HTMLDocument.Iterator;
 
 public class Evaluation {
 	
-	private static HashMap<String, List<JudgedDocument>> qrelsMap = new HashMap<String, List<JudgedDocument>>();
+	private static HashMap<String, HashMap<String, String>> qrelsMap = new HashMap<>();
 	
-	private static HashMap<String, List<String>> resultsMap = new HashMap<String, List<String>>();
+	private static HashMap<String, List<String>> resultsMap = new HashMap<>();
+	
+	// Evaluation metrics
+	private static float tp, fp, fn, precision, recall, f1balanced;
 
 	public static void main(String[] args) {
 		String usage = "java org.apache.lucene.demo.IndexFiles"
@@ -62,14 +65,13 @@ public class Evaluation {
 			while ((line = qrelsBr.readLine()) != null) {
 				String[] elements = line.split("\\s+");
 				if (!qrelsMap.containsKey(elements[0])) {
-					qrelsMap.put(elements[0], new ArrayList<>());
+					qrelsMap.put(elements[0], new HashMap<>());
 				}
-				qrelsMap.get(elements[0])
-					.add(new JudgedDocument(elements[1], elements[2].contentEquals("1")));
+				qrelsMap.get(elements[0]).put(elements[1], elements[2]);
 			}
 			
 			// Read results file
-			while ((line = qrelsBr.readLine()) != null) {
+			while ((line = resultsBr.readLine()) != null) {
 				String[] elements = line.split("\\s+");
 				if (!resultsMap.containsKey(elements[0])) {
 					resultsMap.put(elements[0], new ArrayList<>());
@@ -93,17 +95,29 @@ public class Evaluation {
 		try {
 			outputWriter = new FileWriter(outputFile);
 			PrintWriter pw = new PrintWriter(outputWriter);
-
-			for (Entry<String, List<JudgedDocument>> entry : qrelsMap.entrySet()) {
-			    //System.out.println("clave=" + entry.getKey() + ", valor=" + entry.getValue());
+			
+			// What happens if not all information needs have been judged or appear in results?
+			for (Entry<String, HashMap<String, String>> entry : qrelsMap.entrySet()) {
+				// Initialize basic metrics values
+				tp = 0;
+				fp = 0;
+				fn = 0;
+				precision = 0;
+				recall = 0;
+				f1balanced = 0;
+				calculateBasicMetrics(entry.getKey());
+				precision();
+				recall();
+				f1balanced();
 			    pw.println("INFORMATION_NEED " + entry.getKey());
-			    pw.println("precision " + precision());
-			    pw.println("recall " + recall());
-			    pw.println("F1 " + f1balanced());
+			    pw.println("precision " + String.valueOf(precision));
+			    pw.println("recall " + String.valueOf(recall));
+			    pw.println("F1 " + String.valueOf(f1balanced));
 			    pw.println("prec@10 " + precAt10());
 //			    pw.println("average_precision " + average_precision());
 //			    pw.println("interpolated_recall_precision " + average_precision());
 			    pw.println();
+			    
 			}
 			
 			outputWriter.close();
@@ -114,20 +128,46 @@ public class Evaluation {
 		}
 	}
 	
-	private static String precision() {
-		return "";
+	private static void calculateBasicMetrics(String infNeed) {
+		if (resultsMap.containsKey(infNeed)) {
+			// If system returned any docs for infNeed
+			HashMap<String, String> qrelsInnerMap = qrelsMap.get(infNeed);
+			List<String> resultsList = resultsMap.get(infNeed);
+			for (String docId: resultsList) {
+				if (qrelsInnerMap.containsKey(docId)) {
+					if(qrelsInnerMap.get(docId).equals("1")) { // If doc is relevant
+						tp++;
+					}
+					else {
+						fp++;
+					}
+				}
+		    }
+			for (Entry<String, String> entry : qrelsInnerMap.entrySet()) {
+				if(entry.getValue().equals("1") && !resultsList.contains(entry.getKey())) {
+					fn++;
+				}
+			}
+		}
+		
+		
 	}
 	
-	private static String recall() {
-		return "";
+	private static void precision() {
+		precision = tp / (tp + fp);
 	}
 	
-	private static String f1balanced() {
-		return "";
+	private static void recall() {
+		recall = tp / (tp + fn);
+	}
+	
+	private static void f1balanced() {
+		f1balanced = (2 * precision * recall) / (precision + recall);
 	}
 	
 	private static String precAt10() {
 		return "";
 	}
+	
 
 }

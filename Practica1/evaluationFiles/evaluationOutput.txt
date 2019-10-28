@@ -1,12 +1,12 @@
 INFORMATION_NEED 1
-precision 
-recall 
-F1 
+precision 0.3
+recall 0.75
+F1 0.42857146
 prec@10 
 
 INFORMATION_NEED 2
-precision 
-recall 
-F1 
+precision 0.4
+recall 1.0
+F1 0.5714286
 prec@10 
 
