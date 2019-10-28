@@ -113,8 +113,8 @@ public class Evaluation {
 			    pw.println("precision " + String.valueOf(precision));
 			    pw.println("recall " + String.valueOf(recall));
 			    pw.println("F1 " + String.valueOf(f1balanced));
-			    pw.println("prec@10 " + precAt10());
-//			    pw.println("average_precision " + average_precision());
+			    pw.println("prec@10 " + precAt10(entry.getKey()));
+			    pw.println("average_precision " + average_precision(entry.getKey()));
 //			    pw.println("interpolated_recall_precision " + average_precision());
 			    pw.println();
 			    
@@ -165,8 +165,58 @@ public class Evaluation {
 		f1balanced = (2 * precision * recall) / (precision + recall);
 	}
 	
-	private static String precAt10() {
-		return "";
+	private static String precAt10(String infNeed) {
+		float tp10 = 0;
+		if (resultsMap.containsKey(infNeed)) {
+			// If system returned any docs for infNeed
+			HashMap<String, String> qrelsInnerMap = qrelsMap.get(infNeed);
+			List<String> resultsList = resultsMap.get(infNeed);
+			for (int i = 0; i < resultsList.size() && i < 10; i++) {
+				if (qrelsInnerMap.containsKey(resultsList.get(i))) {
+					if(qrelsInnerMap.get(resultsList.get(i)).equals("1")) { // If doc is relevant
+						tp10++;
+					}
+				}
+		    }
+		}
+		return String.valueOf(tp10 / 10);
+	}
+	
+	private static String average_precision(String infNeed) {
+		float meanPrecision = 0;
+		float numRelDocs = 0;
+		if (resultsMap.containsKey(infNeed)) {
+			// If system returned any docs for infNeed
+			HashMap<String, String> qrelsInnerMap = qrelsMap.get(infNeed);
+			List<String> resultsList = resultsMap.get(infNeed);
+			for (int i = 0; i < resultsList.size(); i++) {
+				if (qrelsInnerMap.containsKey(resultsList.get(i))) {
+					if(qrelsInnerMap.get(resultsList.get(i)).equals("1")) { // If doc is relevant
+						meanPrecision += precAtK(infNeed, i + 1);
+						numRelDocs++;
+					}
+				}
+		    }
+		}
+		return String.valueOf(meanPrecision / numRelDocs);
+		
+	}
+	
+	private static float precAtK(String infNeed, int k) {
+		float tpk = 0;
+		if (resultsMap.containsKey(infNeed)) {
+			// If system returned any docs for infNeed
+			HashMap<String, String> qrelsInnerMap = qrelsMap.get(infNeed);
+			List<String> resultsList = resultsMap.get(infNeed);
+			for (int i = 0; i < k; i++) {
+				if (qrelsInnerMap.containsKey(resultsList.get(i))) {
+					if(qrelsInnerMap.get(resultsList.get(i)).equals("1")) { // If doc is relevant
+						tpk++;
+					}
+				}
+		    }
+		}
+		return tpk / k;
 	}
 	
 
