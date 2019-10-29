@@ -18,11 +18,16 @@ package org.apache.lucene.demo;
  */
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Paths;
 import java.util.Date;
+import java.util.HashMap;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.es.SpanishAnalyzer;
@@ -39,16 +44,41 @@ import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.TotalHitCountCollector;
 import org.apache.lucene.store.FSDirectory;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /** Simple command-line based search demo. */
 public class SearchFilesTraditional {
 
-	private SearchFilesTraditional() {
-	}
+	
+	private static HashMap<String, String> infoNeedsMap = new HashMap<>();
+	
+	private SearchFilesTraditional() {}
 
 	/** Simple command-line based search demo. */
 	public static void main(String[] args) throws Exception {
-
+		
+		File fXmlFile = new File("../MiniTREC/necesidadesInformacionElegidas.xml");
+		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+		org.w3c.dom.Document doc = dBuilder.parse(fXmlFile);
+				
+		doc.getDocumentElement().normalize();
+		NodeList nList = doc.getElementsByTagName("informationNeed");
+				
+		for (int temp = 0; temp < nList.getLength(); temp++) {
+			Node nNode = nList.item(temp);		
+			if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+				Element eElement = (Element) nNode;
+				infoNeedsMap.put(eElement.getElementsByTagName("identifier").item(0).getTextContent(),
+								 eElement.getElementsByTagName("text").item(0).getTextContent());
+			}
+		}
+		
+		
+		
+		/*
 		String usage = "Usage:\tjava org.apache.lucene.demo.SearchFiles [-index dir] [-field f] [-repeat n] [-queries file] [-query string] [-raw] [-paging hitsPerPage]\n\nSee http://lucene.apache.org/core/4_1_0/demo/ for details.";
 		if (args.length > 0 && ("-h".equals(args[0]) || "-help".equals(args[0]))) {
 			System.out.println(usage);
@@ -166,8 +196,11 @@ public class SearchFilesTraditional {
 
 		}
 		reader.close();
+		
+		*/
 	}
 
+		
 	/**
 	 * This demonstrates a typical paging search scenario, where the search engine
 	 * presents pages of size n to the user. The user can then go to the next page
