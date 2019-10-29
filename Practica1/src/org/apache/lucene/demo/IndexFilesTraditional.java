@@ -65,7 +65,6 @@ public class IndexFilesTraditional {
                  + "in INDEX_PATH that can be searched with SearchFiles";
     String indexPath = "index";
     String docsPath = null;
-    boolean create = true;
     for(int i=0;i<args.length;i++) {
       if ("-index".equals(args[i])) {
         indexPath = args[i+1];
@@ -73,8 +72,6 @@ public class IndexFilesTraditional {
       } else if ("-docs".equals(args[i])) {
         docsPath = args[i+1];
         i++;
-      } else if ("-update".equals(args[i])) {
-        create = false;
       }
     }
 
@@ -97,14 +94,10 @@ public class IndexFilesTraditional {
       Analyzer analyzer = new StandardAnalyzer();
       IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
 
-      if (create) {
+      
         // Create a new index in the directory, removing any
         // previously indexed documents:
         iwc.setOpenMode(OpenMode.CREATE);
-      } else {
-        // Add new documents to an existing index:
-        iwc.setOpenMode(OpenMode.CREATE_OR_APPEND);
-      }
 
       // Optional: for better indexing performance, if you
       // are indexing many documents, increase the RAM
@@ -132,8 +125,7 @@ public class IndexFilesTraditional {
       System.out.println(end.getTime() - start.getTime() + " total milliseconds");
 
     } catch (IOException e) {
-      System.out.println(" caught a " + e.getClass() +
-       "\n with message: " + e.getMessage());
+      System.out.println(" caught a " + e.getClass() + "\n with message: " + e.getMessage());
     }
   }
 

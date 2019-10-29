@@ -32,7 +32,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.es.SpanishAnalyzer;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.DoublePoint;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.queryparser.classic.QueryParser;
@@ -59,7 +58,27 @@ public class SearchFilesTraditional {
 	/** Simple command-line based search demo. */
 	public static void main(String[] args) throws Exception {
 		
-		File fXmlFile = new File("../MiniTREC/necesidadesInformacionElegidas.xml");
+		
+		String indexPath = "index";
+	    String infoNeedsPath = null;
+	    String resultsPath = null;
+		
+		for(int i=0;i<args.length;i++) {
+		      if ("-index".equals(args[i])) {
+		        indexPath = args[i+1];
+		        i++;
+		      } 
+		      else if ("-infoNeeds".equals(args[i])) {
+		    	  infoNeedsPath = args[i+1];
+		        i++;
+		      }
+		      else if ("-output".equals(args[i])) {
+		    	  resultsPath = args[i+1];
+			        i++;
+		      }
+		}
+		
+		File fXmlFile = new File(infoNeedsPath);
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 		org.w3c.dom.Document doc = dBuilder.parse(fXmlFile);
@@ -78,56 +97,28 @@ public class SearchFilesTraditional {
 		
 		
 		
-		/*
+		
 		String usage = "Usage:\tjava org.apache.lucene.demo.SearchFiles [-index dir] [-field f] [-repeat n] [-queries file] [-query string] [-raw] [-paging hitsPerPage]\n\nSee http://lucene.apache.org/core/4_1_0/demo/ for details.";
 		if (args.length > 0 && ("-h".equals(args[0]) || "-help".equals(args[0]))) {
 			System.out.println(usage);
 			System.exit(0);
 		}
-		String index = "index";
+
 		String field = "contents";
 		String queries = null;
 		int repeat = 0;
-		String queryString = null;
-
-		for (int i = 0; i < args.length; i++) {
-			if ("-index".equals(args[i])) {
-				index = args[i + 1];
-				i++;
-			} else if ("-field".equals(args[i])) {
-				field = args[i + 1];
-				i++;
-			} else if ("-queries".equals(args[i])) {
-				queries = args[i + 1];
-				i++;
-			} else if ("-query".equals(args[i])) {
-				queryString = args[i + 1];
-				i++;
-			} else if ("-repeat".equals(args[i])) {
-				repeat = Integer.parseInt(args[i + 1]);
-				i++;
-			}
-		}
-
-		IndexReader reader = DirectoryReader.open(FSDirectory.open(Paths.get(index)));
+		
+	
+		IndexReader reader = DirectoryReader.open(FSDirectory.open(Paths.get(indexPath)));
 		IndexSearcher searcher = new IndexSearcher(reader);
 		Analyzer analyzer = new SpanishAnalyzer();
 
-		BufferedReader in = null;
-		if (queries != null) {
-			in = new BufferedReader(new InputStreamReader(new FileInputStream(queries), "UTF-8"));
-		} else {
-			in = new BufferedReader(new InputStreamReader(System.in, "UTF-8"));
-		}
 		QueryParser parser = new QueryParser(field, analyzer);
 		BooleanQuery.Builder finalQuery = new BooleanQuery.Builder();
 		boolean atLeastOne = false;
 		while (true) {
-			if (queries == null && queryString == null) { // prompt the user
-				System.out.println("Enter query: ");
-			}
-
-			String line = queryString != null ? queryString : in.readLine();
+			
+			String line ="";
 
 			if (line == null || line.length() == -1) {
 				break;
@@ -151,53 +142,21 @@ public class SearchFilesTraditional {
 					System.out.println("Time: " + (end.getTime() - start.getTime()) + "ms");
 				}
 
-				showSearchResults(in, searcher, querySearch);
+				showSearchResults(searcher, querySearch);
 
 				atLeastOne = false;
 				finalQuery = new BooleanQuery.Builder();
 
-				if (queryString != null) {
-					break;
-				}
+				
 			} else if (line.equals(":q")) {
 				break;
-			} else {
+			} 
+			else {
 				atLeastOne = true;
-				Double west, east, south, north;
-				if (line.split(":")[0].equals("spatial")) {
-					west = Double.parseDouble(line.substring(line.indexOf(':') + 1, line.indexOf(',')));
-					line = line.substring(line.indexOf(',') + 1, line.length());
-					east = Double.parseDouble(line.substring(0, line.indexOf(',')));
-					line = line.substring(line.indexOf(',') + 1, line.length());
-					south = Double.parseDouble(line.substring(0, line.indexOf(',')));
-					line = line.substring(line.indexOf(',') + 1, line.length());
-					north = Double.parseDouble(line.substring(0, line.length()));
-
-					// Xmin <= east
-					Query westRangeQuery = DoublePoint.newRangeQuery("west", Double.NEGATIVE_INFINITY, east);
-					// Xmax >= west
-					Query eastRangeQuery = DoublePoint.newRangeQuery("east", west, Double.POSITIVE_INFINITY);
-					// Ymin <= north
-					Query southRangeQuery = DoublePoint.newRangeQuery("south", Double.NEGATIVE_INFINITY, north);
-					// Ymax >= south
-					Query northRangeQuery = DoublePoint.newRangeQuery("north", south, Double.POSITIVE_INFINITY);
-
-					// Construction
-					BooleanQuery queryBool = new BooleanQuery.Builder().add(westRangeQuery, BooleanClause.Occur.MUST)
-							.add(eastRangeQuery, BooleanClause.Occur.MUST)
-							.add(southRangeQuery, BooleanClause.Occur.MUST)
-							.add(northRangeQuery, BooleanClause.Occur.MUST).build();
-
-					finalQuery.add(queryBool, BooleanClause.Occur.SHOULD);
-				} else {
-					finalQuery.add(parser.parse(line), BooleanClause.Occur.SHOULD);
-				}
+				finalQuery.add(parser.parse(line), BooleanClause.Occur.SHOULD);
 			}
-
 		}
 		reader.close();
-		
-		*/
 	}
 
 		
@@ -211,7 +170,7 @@ public class SearchFilesTraditional {
 	 * limit, then the query is executed another time and all hits are collected.
 	 * 
 	 */
-	public static void showSearchResults(BufferedReader in, IndexSearcher searcher, Query query) throws IOException {
+	public static void showSearchResults(IndexSearcher searcher, Query query) throws IOException {
 		TotalHitCountCollector collector = new TotalHitCountCollector();
 		searcher.search(query, collector);
 		TopDocs results  = searcher.search(query, Math.max(1, collector.getTotalHits()));

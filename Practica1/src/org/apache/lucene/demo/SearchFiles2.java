@@ -174,6 +174,7 @@ public class SearchFiles2 {
 				  finalQuery.add(queryBool, BooleanClause.Occur.SHOULD);
 		      }
 		      else {
+		    	  atLeastOne = true;
 		    	  finalQuery.add(parser.parse(line), BooleanClause.Occur.SHOULD);
 		      }
 	      }
