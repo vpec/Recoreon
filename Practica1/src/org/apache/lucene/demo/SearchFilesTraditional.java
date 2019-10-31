@@ -21,10 +21,12 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.file.Paths;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map.Entry;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -46,6 +48,11 @@ import org.apache.lucene.store.FSDirectory;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import opennlp.tools.tokenize.SimpleTokenizer;
+import opennlp.tools.tokenize.Tokenizer;
+import opennlp.tools.tokenize.TokenizerME;
+import opennlp.tools.tokenize.TokenizerModel;
 
 /** Simple command-line based search demo. */
 public class SearchFilesTraditional {
@@ -95,68 +102,48 @@ public class SearchFilesTraditional {
 			}
 		}
 		
-		
-		
-		
-		String usage = "Usage:\tjava org.apache.lucene.demo.SearchFiles [-index dir] [-field f] [-repeat n] [-queries file] [-query string] [-raw] [-paging hitsPerPage]\n\nSee http://lucene.apache.org/core/4_1_0/demo/ for details.";
-		if (args.length > 0 && ("-h".equals(args[0]) || "-help".equals(args[0]))) {
-			System.out.println(usage);
-			System.exit(0);
-		}
-
-		String field = "contents";
-		String queries = null;
-		int repeat = 0;
-		
-	
-		IndexReader reader = DirectoryReader.open(FSDirectory.open(Paths.get(indexPath)));
-		IndexSearcher searcher = new IndexSearcher(reader);
-		Analyzer analyzer = new SpanishAnalyzer();
-
-		QueryParser parser = new QueryParser(field, analyzer);
-		BooleanQuery.Builder finalQuery = new BooleanQuery.Builder();
-		boolean atLeastOne = false;
-		while (true) {
+		for (Entry<String, String> entry : infoNeedsMap.entrySet()) {				
+			System.out.println(entry.getKey());
+			System.out.println(entry.getValue());
 			
-			String line ="";
+			
+			
+			String field = "contents";
+			String queries = null;
+			
+			IndexReader reader = DirectoryReader.open(FSDirectory.open(Paths.get(indexPath)));
+			IndexSearcher searcher = new IndexSearcher(reader);
+			Analyzer analyzer = new SpanishAnalyzer2();
 
-			if (line == null || line.length() == -1) {
-				break;
-			}
-
-			line = line.trim();
-			if (line.length() == 0) {
-				if (!atLeastOne) {
-					break;
-				}
-				// Execute query
-				Query querySearch = finalQuery.build();
-				System.out.println("Searching for: " + querySearch.toString(field));
-
-				if (repeat > 0) { // repeat & time as benchmark
-					Date start = new Date();
-					for (int i = 0; i < repeat; i++) {
-						searcher.search(querySearch, 100);
-					}
-					Date end = new Date();
-					System.out.println("Time: " + (end.getTime() - start.getTime()) + "ms");
-				}
-
-				showSearchResults(searcher, querySearch);
-
-				atLeastOne = false;
-				finalQuery = new BooleanQuery.Builder();
-
+			QueryParser parser = new QueryParser(field, analyzer);
+			BooleanQuery.Builder finalQuery = new BooleanQuery.Builder();
 				
-			} else if (line.equals(":q")) {
-				break;
-			} 
-			else {
-				atLeastOne = true;
-				finalQuery.add(parser.parse(line), BooleanClause.Occur.SHOULD);
+			
+			String line = entry.getValue().replace("?", "").replace("¿", "");
+			System.out.println(line);
+			
+			Tokenizer tokenizer = SimpleTokenizer.INSTANCE;
+			String tokens[] = tokenizer.tokenize(line);
+			
+			line = "";
+			for(String word : tokens) {
+				line = line + " description:" + word;
 			}
-		}
-		reader.close();
+			line = line.trim();
+			
+			
+			finalQuery.add(parser.parse(line), BooleanClause.Occur.SHOULD);
+				
+			// Execute query
+			Query querySearch = finalQuery.build();
+			
+			Query query = parser.parse(line);
+			System.out.println("Searching for: " + query.toString(field));
+			
+			showSearchResults(searcher, query);
+			
+			reader.close();
+		}	
 	}
 
 		
@@ -179,7 +166,9 @@ public class SearchFilesTraditional {
 		System.out.println(numTotalHits + " total matching documents");
 		for (int i = 0; i < numTotalHits; i++) {
 			Document doc = searcher.doc(hits[i].doc);
-			System.out.println((i + 1) + ". doc=" + hits[i].doc + " path=" + doc.get("path") + " score=" + hits[i].score);
+			if(i < 10) {
+				System.out.println((i + 1) + ". doc=" + hits[i].doc + " path=" + doc.get("path") + " score=" + hits[i].score);
+			}
 		}
 	}
 }

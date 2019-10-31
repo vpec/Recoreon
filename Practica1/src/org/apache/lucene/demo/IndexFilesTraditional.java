@@ -36,11 +36,16 @@ import org.apache.lucene.store.FSDirectory;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import opennlp.tools.tokenize.Tokenizer;
+import opennlp.tools.tokenize.TokenizerME;
+import opennlp.tools.tokenize.TokenizerModel;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.file.Paths;
 import java.util.Date;
@@ -91,7 +96,7 @@ public class IndexFilesTraditional {
       System.out.println("Indexing to directory '" + indexPath + "'...");
 
       Directory dir = FSDirectory.open(Paths.get(indexPath));
-      Analyzer analyzer = new StandardAnalyzer();
+      Analyzer analyzer = new SpanishAnalyzer2();
       IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
 
       
@@ -202,6 +207,8 @@ public class IndexFilesTraditional {
               org.w3c.dom.Document document = builder.parse(fisCopy);
               Element element = document.getDocumentElement();
               NodeList nodes = element.getChildNodes();
+              
+            	
 
               String id;
               for (int i = 0; i < nodes.getLength(); i++) {
@@ -212,6 +219,7 @@ public class IndexFilesTraditional {
                 		 id.contentEquals("dc:description") || 
                 		 id.contentEquals("dc:creator")) {
                 	 id = id.substring(id.indexOf(":") + 1, id.length());
+//                	 String tokens[] = tokenizer.tokenize(nodes.item(i).getTextContent());
                 	 doc.add(new TextField(id, nodes.item(i).getTextContent(), Field.Store.YES));
                  } 
                  // StringFields
