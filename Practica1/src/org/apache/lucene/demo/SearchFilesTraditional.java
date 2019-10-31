@@ -41,6 +41,7 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.BoostQuery;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.TotalHitCountCollector;
@@ -49,10 +50,15 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import opennlp.tools.namefind.NameFinderME;
+import opennlp.tools.namefind.TokenNameFinderModel;
+import opennlp.tools.postag.POSModel;
+import opennlp.tools.postag.POSTaggerME;
 import opennlp.tools.tokenize.SimpleTokenizer;
 import opennlp.tools.tokenize.Tokenizer;
 import opennlp.tools.tokenize.TokenizerME;
 import opennlp.tools.tokenize.TokenizerModel;
+import opennlp.tools.util.Span;
 
 /** Simple command-line based search demo. */
 public class SearchFilesTraditional {
@@ -125,22 +131,58 @@ public class SearchFilesTraditional {
 			Tokenizer tokenizer = SimpleTokenizer.INSTANCE;
 			String tokens[] = tokenizer.tokenize(line);
 			
-			line = "";
-			for(String word : tokens) {
-				line = line + " description:" + word;
+			
+			
+			
+			InputStream modelIn = new FileInputStream("es-pos-maxent.bin");
+			POSModel model = new POSModel(modelIn);
+			POSTaggerME tagger = new POSTaggerME(model);
+			String tags[] = tagger.tag(tokens);
+			for(int i = 0; i < tags.length; i++) {
+				//System.out.println(tokens[i] + " " + tags[i]);
 			}
-			line = line.trim();
+			
+			/*
+			 * Z = number
+			 * NC = noun
+			 * V* = verb
+			 */
+			
+			InputStream modelInFinder = new FileInputStream("es-ner-person.bin");
+			TokenNameFinderModel modelFinder = new TokenNameFinderModel(modelInFinder);
+			NameFinderME nameFinder = new NameFinderME(modelFinder);
+
+		    Span nameSpans[] = nameFinder.find(tokens);
+		    
+		    if(nameSpans.length > 0) {
+		    	for(Span name : nameSpans) {
+			    	finalQuery.add(new BoostQuery(parser.parse("creator:" + tokens[name.getStart()]), 10), BooleanClause.Occur.SHOULD);
+			    }
+		    }
+		    		    
+
 			
 			
-			finalQuery.add(parser.parse(line), BooleanClause.Occur.SHOULD);
+			
+			String lineDescription = "";
+			String lineTitle = "";
+			for(String word : tokens) {
+				lineDescription = lineDescription + " description:" + word;
+				lineTitle = lineTitle + " title:" + word;
+			}
+			lineDescription = lineDescription.trim();
+			lineTitle = lineTitle.trim();
+			
+			finalQuery.add(parser.parse(lineDescription), BooleanClause.Occur.SHOULD);
+			finalQuery.add(new BoostQuery(parser.parse(lineTitle), 2), BooleanClause.Occur.SHOULD);
 				
 			// Execute query
 			Query querySearch = finalQuery.build();
 			
-			Query query = parser.parse(line);
-			System.out.println("Searching for: " + query.toString(field));
+//			Query query = parser.parse(line);
+			System.out.println("Searching for: " + querySearch.toString(field));
 			
-			showSearchResults(searcher, query);
+			showSearchResults(searcher, querySearch);
 			
 			reader.close();
 		}	
