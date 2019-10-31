@@ -118,8 +118,8 @@ public class SearchFilesTraditional {
 			QueryParser parser = new QueryParser(field, analyzer);
 			BooleanQuery.Builder finalQuery = new BooleanQuery.Builder();
 				
-			
-			String line = entry.getValue().replace("?", "").replace("¿", "");
+			// Remove ? and * because they may be confused as wildcard querys
+			String line = entry.getValue().replace("?", "").replace("*", "");
 			System.out.println(line);
 			
 			Tokenizer tokenizer = SimpleTokenizer.INSTANCE;
