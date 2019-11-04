@@ -20,12 +20,17 @@ package org.apache.lucene.demo;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map.Entry;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -108,6 +113,12 @@ public class SearchFilesTraditional {
 			}
 		}
 		
+		File resultsFile = new File(resultsPath);
+		FileWriter resultsWriter;
+		
+		resultsWriter = new FileWriter(resultsFile);
+		PrintWriter pw = new PrintWriter(resultsWriter);
+		
 		for (Entry<String, String> entry : infoNeedsMap.entrySet()) {				
 			System.out.println(entry.getKey());
 			System.out.println(entry.getValue());
@@ -115,7 +126,6 @@ public class SearchFilesTraditional {
 			
 			
 			String field = "contents";
-			String queries = null;
 			
 			IndexReader reader = DirectoryReader.open(FSDirectory.open(Paths.get(indexPath)));
 			IndexSearcher searcher = new IndexSearcher(reader);
@@ -126,21 +136,51 @@ public class SearchFilesTraditional {
 				
 			// Remove ? and * because they may be confused as wildcard querys
 			String line = entry.getValue().replace("?", "").replace("*", "");
+			line = line.toLowerCase();
 			System.out.println(line);
 			
 			Tokenizer tokenizer = SimpleTokenizer.INSTANCE;
 			String tokens[] = tokenizer.tokenize(line);
 			
+			List<String> tokensList = Arrays.asList(tokens);
 			
+			// Prioritize bachelorThesis
+			if(tokensList.contains("tfg") || tokensList.contains("tfgs") || 
+					(tokensList.contains("fin") && tokensList.contains("grado"))){
+				finalQuery.add(new BoostQuery(parser.parse("type:bachelorThesis"),  2), BooleanClause.Occur.SHOULD);
+			}
+			
+			// Prioritize masterThesis
+			if(tokensList.contains("tesis") || tokensList.contains("tfm") || tokensList.contains("tfms") ||
+					(tokensList.contains("fin") && (tokensList.contains("máster") || tokensList.contains("master")))){
+				finalQuery.add(new BoostQuery(parser.parse("type:masterThesis"), 2), BooleanClause.Occur.SHOULD);
+			}
 			
 			
 			InputStream modelIn = new FileInputStream("es-pos-maxent.bin");
 			POSModel model = new POSModel(modelIn);
 			POSTaggerME tagger = new POSTaggerME(model);
 			String tags[] = tagger.tag(tokens);
+			List<Integer> dateList = new ArrayList<>();
 			for(int i = 0; i < tags.length; i++) {
-				//System.out.println(tokens[i] + " " + tags[i]);
+				if(tags[i].startsWith("Z") && Integer.parseInt(tokens[i]) > 2000) {
+					dateList.add(Integer.parseInt(tokens[i]));
+				}
 			}
+			
+			if(!dateList.isEmpty()) {
+				if(dateList.size() == 2) {
+					Integer lower = dateList.get(0) < dateList.get(1) ? dateList.get(0) : dateList.get(1);
+					Integer upper = lower == dateList.get(0) ? dateList.get(1) : dateList.get(0);
+					finalQuery.add(parser.parse("date:[" + lower.toString() + " TO " + upper.toString() + "]"), BooleanClause.Occur.SHOULD);
+				}
+				else {
+					for(Integer dateElement : dateList) {
+						finalQuery.add(parser.parse("date:" + dateElement.toString()), BooleanClause.Occur.SHOULD);
+					}
+				}
+			}
+			
 			
 			/*
 			 * Z = number
@@ -148,22 +188,19 @@ public class SearchFilesTraditional {
 			 * V* = verb
 			 */
 			
-			InputStream modelInFinder = new FileInputStream("es-ner-person.bin");
-			TokenNameFinderModel modelFinder = new TokenNameFinderModel(modelInFinder);
-			NameFinderME nameFinder = new NameFinderME(modelFinder);
+			InputStream modelInNameFinder = new FileInputStream("es-ner-person.bin");
+			TokenNameFinderModel modelNameFinder = new TokenNameFinderModel(modelInNameFinder);
+			NameFinderME nameFinder = new NameFinderME(modelNameFinder);
 
 		    Span nameSpans[] = nameFinder.find(tokens);
 		    
 		    if(nameSpans.length > 0) {
 		    	for(Span name : nameSpans) {
-			    	finalQuery.add(new BoostQuery(parser.parse("creator:" + tokens[name.getStart()]), 10), BooleanClause.Occur.SHOULD);
+			    	finalQuery.add(new BoostQuery(parser.parse("creator:" + tokens[name.getStart()]), 2), BooleanClause.Occur.SHOULD);
 			    }
-		    }
-		    		    
+		    }		    
 
-			
-			
-			
+
 			String lineDescription = "";
 			String lineTitle = "";
 			for(String word : tokens) {
@@ -182,10 +219,13 @@ public class SearchFilesTraditional {
 //			Query query = parser.parse(line);
 			System.out.println("Searching for: " + querySearch.toString(field));
 			
-			showSearchResults(searcher, querySearch);
+			
+			
+			showSearchResults(searcher, querySearch, entry.getKey(), pw);
 			
 			reader.close();
-		}	
+		}
+		resultsWriter.close();
 	}
 
 		
@@ -199,7 +239,7 @@ public class SearchFilesTraditional {
 	 * limit, then the query is executed another time and all hits are collected.
 	 * 
 	 */
-	public static void showSearchResults(IndexSearcher searcher, Query query) throws IOException {
+	public static void showSearchResults(IndexSearcher searcher, Query query, String infoNeedId, PrintWriter pw) throws IOException {
 		TotalHitCountCollector collector = new TotalHitCountCollector();
 		searcher.search(query, collector);
 		TopDocs results  = searcher.search(query, Math.max(1, collector.getTotalHits()));
@@ -208,6 +248,7 @@ public class SearchFilesTraditional {
 		System.out.println(numTotalHits + " total matching documents");
 		for (int i = 0; i < numTotalHits; i++) {
 			Document doc = searcher.doc(hits[i].doc);
+			pw.println(infoNeedId + "\t" + doc.get("path"));
 			if(i < 10) {
 				System.out.println((i + 1) + ". doc=" + hits[i].doc + " path=" + doc.get("path") + " score=" + hits[i].score);
 			}

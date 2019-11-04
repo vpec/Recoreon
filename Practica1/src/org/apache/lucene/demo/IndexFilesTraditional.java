@@ -215,11 +215,9 @@ public class IndexFilesTraditional {
                  id = nodes.item(i).getNodeName();
                  // TextFields
                  if(id.contentEquals("dc:title") || 
-                		 id.contentEquals("dc:subject") || 
                 		 id.contentEquals("dc:description") || 
                 		 id.contentEquals("dc:creator")) {
                 	 id = id.substring(id.indexOf(":") + 1, id.length());
-//                	 String tokens[] = tokenizer.tokenize(nodes.item(i).getTextContent());
                 	 doc.add(new TextField(id, nodes.item(i).getTextContent(), Field.Store.YES));
                  } 
                  // StringFields
@@ -233,8 +231,14 @@ public class IndexFilesTraditional {
                 	 String dateField = nodes.item(i).getTextContent();
                 	 if (dateField.contains("T")) {
                 		 dateField = dateField.substring(0, dateField.indexOf("T"));
+                		 dateField = dateField.substring(0, dateField.indexOf("-"));
                 	 }
                 	 doc.add(new TextField(id, dateField.replace("-", ""), Field.Store.YES));	 
+                 }
+                 else if(id.contentEquals("dc:type")) {
+                	 id = id.substring(id.indexOf(":") + 1, id.length());
+                	 String typeField = nodes.item(i).getTextContent().replace("info:eu-repo/semantics/", "");
+                	 doc.add(new TextField(id, typeField, Field.Store.YES));
                  }
               }
           }
