@@ -221,7 +221,7 @@ public class SearchFilesTraditional {
 			
 			
 			
-			showSearchResults(searcher, querySearch, entry.getKey(), pw);
+			writeSearchResults(searcher, querySearch, entry.getKey(), pw);
 			
 			reader.close();
 		}
@@ -239,7 +239,7 @@ public class SearchFilesTraditional {
 	 * limit, then the query is executed another time and all hits are collected.
 	 * 
 	 */
-	public static void showSearchResults(IndexSearcher searcher, Query query, String infoNeedId, PrintWriter pw) throws IOException {
+	public static void writeSearchResults(IndexSearcher searcher, Query query, String infoNeedId, PrintWriter pw) throws IOException {
 		TotalHitCountCollector collector = new TotalHitCountCollector();
 		searcher.search(query, collector);
 		TopDocs results  = searcher.search(query, Math.max(1, collector.getTotalHits()));

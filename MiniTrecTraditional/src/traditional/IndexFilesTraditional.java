@@ -186,15 +186,6 @@ public class IndexFilesTraditional {
           // or positional information:
           Field pathField = new StringField("path", file.getPath(), Field.Store.YES);
           doc.add(pathField);
-
-          // Add the last modified date of the file a field named "modified".
-          // Use a LongField that is indexed (i.e. efficiently filterable with
-          // NumericRangeFilter).  This indexes to milli-second resolution, which
-          // is often too fine.  You could instead create a number based on
-          // year/month/day/hour/minutes/seconds, down the resolution you require.
-          // For example the long value 2011021714 would mean
-          // February 17, 2011, 2-3 PM.
-          doc.add(new StoredField("modified", file.lastModified()));
           
           // Add the contents of the file to a field named "contents".  Specify a Reader,
           // so that the text of the file is tokenized and indexed, but not stored.
@@ -207,8 +198,6 @@ public class IndexFilesTraditional {
               org.w3c.dom.Document document = builder.parse(fisCopy);
               Element element = document.getDocumentElement();
               NodeList nodes = element.getChildNodes();
-              
-            	
 
               String id;
               for (int i = 0; i < nodes.getLength(); i++) {
@@ -220,12 +209,6 @@ public class IndexFilesTraditional {
                 	 id = id.substring(id.indexOf(":") + 1, id.length());
                 	 doc.add(new TextField(id, nodes.item(i).getTextContent(), Field.Store.YES));
                  } 
-                 // StringFields
-                 else if(id.contentEquals("dc:identifier") || 
-                		 id.contentEquals("dc:language")) {
-                	 id = id.substring(id.indexOf(":") + 1, id.length());
-                	 doc.add(new StringField(id, nodes.item(i).getTextContent(), Field.Store.YES));
-                 }
                  else if(id.contentEquals("dc:date")){
                 	 id = id.substring(id.indexOf(":") + 1, id.length());
                 	 String dateField = nodes.item(i).getTextContent();
@@ -246,19 +229,8 @@ public class IndexFilesTraditional {
         	  System.out.println(e.toString());
           }
           
-          //doc.add(new TextField("title", new BufferedReader(new InputStreamReader(fis, "UTF-8"))));
+          writer.addDocument(doc);
 
-          if (writer.getConfig().getOpenMode() == OpenMode.CREATE) {
-            // New index, so we just add the document (no old document can be there):
-            // System.out.println("adding " + file);
-            writer.addDocument(doc);
-          } else {
-            // Existing index (an old copy of this document may have been indexed) so 
-            // we use updateDocument instead to replace the old one matching the exact 
-            // path, if present:
-            // System.out.println("updating " + file);
-            writer.updateDocument(new Term("path", file.getPath()), doc);
-          }
           
         } finally {
           fis.close();

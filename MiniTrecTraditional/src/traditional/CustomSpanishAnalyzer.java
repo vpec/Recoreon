@@ -63,8 +63,6 @@ public final class CustomSpanishAnalyzer extends StopwordAnalyzerBase {
 
 	static {
       try {
-//        DEFAULT_STOP_SET = WordlistLoader.getSnowballWordSet(IOUtils.getDecodingReader(SnowballFilter.class, 
-//            DEFAULT_STOPWORD_FILE, StandardCharsets.UTF_8));
 		  DEFAULT_STOP_SET = WordlistLoader.getSnowballWordSet(new FileReader("services/spanish_stop.txt"));
       } catch (IOException ex) {
         // default set should always be present as it is part of the
@@ -122,7 +120,6 @@ public final class CustomSpanishAnalyzer extends StopwordAnalyzerBase {
 		result = new StopFilter(result, stopwords);
 		if (!stemExclusionSet.isEmpty())
 			result = new SetKeywordMarkerFilter(result, stemExclusionSet);
-		// result = new SnowballFilter(result, "Spanish");
 		result = new SpanishLightStemFilter(result);
 		return new TokenStreamComponents(source, result);
 	}
