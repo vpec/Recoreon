@@ -28,6 +28,7 @@ import java.io.PrintWriter;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -119,6 +120,9 @@ public class SearchFilesTraditional {
 		resultsWriter = new FileWriter(resultsFile);
 		PrintWriter pw = new PrintWriter(resultsWriter);
 		
+		
+		int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+		
 		for (Entry<String, String> entry : infoNeedsMap.entrySet()) {				
 			System.out.println(entry.getKey());
 			System.out.println(entry.getValue());
@@ -163,7 +167,7 @@ public class SearchFilesTraditional {
 			String tags[] = tagger.tag(tokens);
 			List<Integer> dateList = new ArrayList<>();
 			for(int i = 0; i < tags.length; i++) {
-				if(tags[i].startsWith("Z") && Integer.parseInt(tokens[i]) > 2000) {
+				if(tags[i].startsWith("Z") && Integer.parseInt(tokens[i]) > 2000 && Integer.parseInt(tokens[i]) <= currentYear) {
 					dateList.add(Integer.parseInt(tokens[i]));
 				}
 			}
