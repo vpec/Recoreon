@@ -1,3 +1,13 @@
+/*
+ ***************************************************
+ * Traditional information Retrieval System ********
+ * Authors: Victor Penasco Estivalez - 741294 ******
+ * 			Ruben Rodriguez Esteban  - 737215 ******
+ * Date: 7-11-19 ***********************************
+ ***************************************************
+ */
+
+
 package traditional;
 
 /*
@@ -60,79 +70,83 @@ import javax.xml.parsers.DocumentBuilderFactory;
  */
 public class IndexFilesTraditional {
   
+	
+
+  /**
+   * Default constructor of the class
+   */
   private IndexFilesTraditional() {}
 
+  
+  
   /** Index all text files under a directory. */
   public static void main(String[] args) {
+	  
     String usage = "java org.apache.lucene.demo.IndexFiles"
                  + " [-index INDEX_PATH] [-docs DOCS_PATH] [-update]\n\n"
                  + "This indexes the documents in DOCS_PATH, creating a Lucene index"
                  + "in INDEX_PATH that can be searched with SearchFiles";
+    
+    // Index of the docs
     String indexPath = "index";
     String docsPath = null;
-    for(int i=0;i<args.length;i++) {
-      if ("-index".equals(args[i])) {
-        indexPath = args[i+1];
-        i++;
-      } else if ("-docs".equals(args[i])) {
-        docsPath = args[i+1];
-        i++;
-      }
-    }
+    
+    // Processing of the parameters 
+    for(int i = 0; i< args.length; i++) {
+	   if ("-index".equals(args[i])) {
+	      indexPath = args[i+1];
+	      i++;
+	   } 
+	   else if ("-docs".equals(args[i])) {
+	      docsPath = args[i+1];
+	      i++;
+	   }
+	}
 
+    
     if (docsPath == null) {
       System.err.println("Usage: " + usage);
       System.exit(1);
     }
 
     final File docDir = new File(docsPath);
+    
     if (!docDir.exists() || !docDir.canRead()) {
-      System.out.println("Document directory '" +docDir.getAbsolutePath()+ "' does not exist or is not readable, please check the path");
+      System.out.println("Document directory '" + docDir.getAbsolutePath() + 
+    		  			 "' does not exist or is not readable, please check the path");
       System.exit(1);
     }
     
+    
     Date start = new Date();
     try {
-      System.out.println("Indexing to directory '" + indexPath + "'...");
-
-      Directory dir = FSDirectory.open(Paths.get(indexPath));
-      Analyzer analyzer = new CustomSpanishAnalyzer();
-      IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
+	      System.out.println("Indexing to directory '" + indexPath + "'...");
+	      
+	      Directory dir = FSDirectory.open(Paths.get(indexPath));
+	      Analyzer analyzer = new CustomSpanishAnalyzer();
+	      IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
 
       
-        // Create a new index in the directory, removing any
-        // previously indexed documents:
-        iwc.setOpenMode(OpenMode.CREATE);
+	      // Create a new index in the directory, removing any previously indexed documents:
+	      iwc.setOpenMode(OpenMode.CREATE);
 
-      // Optional: for better indexing performance, if you
-      // are indexing many documents, increase the RAM
-      // buffer.  But if you do this, increase the max heap
-      // size to the JVM (eg add -Xmx512m or -Xmx1g):
-      //
-      // iwc.setRAMBufferSizeMB(256.0);
-
-      IndexWriter writer = new IndexWriter(dir, iwc);
-      indexDocs(writer, docDir);
+	      // Insertion of corpus documents in the index
+          IndexWriter writer = new IndexWriter(dir, iwc);
+          indexDocs(writer, docDir);
       
-      System.out.println(docDir.list().length + " documents indexed");
+          // Show the total documents inserter
+          System.out.println(docDir.list().length + " documents indexed");
+          writer.close();
 
-      // NOTE: if you want to maximize search performance,
-      // you can optionally call forceMerge here.  This can be
-      // a terribly costly operation, so generally it's only
-      // worth it when your index is relatively static (ie
-      // you're done adding documents to it):
-      //
-      // writer.forceMerge(1);
+          Date end = new Date();
+          // Show to total time spent in the insertion
+          System.out.println(end.getTime() - start.getTime() + " total milliseconds");
 
-      writer.close();
-
-      Date end = new Date();
-      System.out.println(end.getTime() - start.getTime() + " total milliseconds");
-
-    } catch (IOException e) {
-      System.out.println(" caught a " + e.getClass() + "\n with message: " + e.getMessage());
+    } 
+    catch (IOException e) {
+         System.out.println(" caught a " + e.getClass() + "\n with message: " + e.getMessage());
     }
-  }
+}
 
   /**
    * Indexes the given file using the given writer, or if a directory is given,
@@ -158,18 +172,22 @@ public class IndexFilesTraditional {
         // an IO error could occur
         if (files != null) {
           for (int i = 0; i < files.length; i++) {
+        	// Indexation of the i-doc in the index
             indexDocs(writer, new File(file, files[i]));
           }
         }
-      } else {
-
+      } 
+      else {
+    	// Reading Flows
         FileInputStream fis;
         FileInputStream fisCopy;
         try {
+          // Open the reading flows
           fis = new FileInputStream(file);
           fisCopy = new FileInputStream(file);
  
-        } catch (FileNotFoundException fnfe) {
+        } 
+        catch (FileNotFoundException fnfe) {
           // at least on windows, some temporary files raise this exception with an "access denied" message
           // checking if the file can be read doesn't help
           return;
@@ -180,18 +198,11 @@ public class IndexFilesTraditional {
           // make a new, empty document
           Document doc = new Document();
 
-          // Add the path of the file as a field named "path".  Use a
-          // field that is indexed (i.e. searchable), but don't tokenize 
-          // the field into separate words and don't index term frequency
-          // or positional information:
+          // Added the path of the file as a field named "path"
           Field pathField = new StringField("path", file.getPath(), Field.Store.YES);
           doc.add(pathField);
           
-          // Add the contents of the file to a field named "contents".  Specify a Reader,
-          // so that the text of the file is tokenized and indexed, but not stored.
-          // Note that FileReader expects the file to be in UTF-8 encoding.
-          // If that's not the case searching for special characters will fail.
-          //doc.add(new TextField("contents", new BufferedReader(new InputStreamReader(fis, "UTF-8")))); //OLD
+          // Added the contents of the file to a field named "contents". 
           DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
           try {
               DocumentBuilder builder = factory.newDocumentBuilder();
@@ -199,26 +210,39 @@ public class IndexFilesTraditional {
               Element element = document.getDocumentElement();
               NodeList nodes = element.getChildNodes();
 
+              // Identificator of the tags of the file
               String id;
               for (int i = 0; i < nodes.getLength(); i++) {
                  id = nodes.item(i).getNodeName();
-                 // TextFields
+                 // Insertion of the textfields
+                 // Control if the textfield is title, description or creator
                  if(id.contentEquals("dc:title") || 
-                		 id.contentEquals("dc:description") || 
-                		 id.contentEquals("dc:creator")) {
+                    id.contentEquals("dc:description") || 
+                    id.contentEquals("dc:creator")) 
+                 {
+                	 // Ignore the "dc:" part from the textfield 
                 	 id = id.substring(id.indexOf(":") + 1, id.length());
+                	 // Add the content of the textfield
                 	 doc.add(new TextField(id, nodes.item(i).getTextContent(), Field.Store.YES));
                  } 
+                 // Control if the texfield is a date
                  else if(id.contentEquals("dc:date")){
+                	 // Ignore the "dc:" part from the textfield 
                 	 id = id.substring(id.indexOf(":") + 1, id.length());
+                	 // Extract the date stored in the textfield
                 	 String dateField = nodes.item(i).getTextContent();
+                	 // Verification of whether the date is expressed as a range with the W3CDTF format
                 	 if (dateField.contains("T")) {
+                		 // Extraction of the dates of the range
                 		 dateField = dateField.substring(0, dateField.indexOf("T"));
                 		 dateField = dateField.substring(0, dateField.indexOf("-"));
                 	 }
+                	 // Add the textfield 
                 	 doc.add(new TextField(id, dateField.replace("-", ""), Field.Store.YES));	 
                  }
+                 // Control if the textfield is a type
                  else if(id.contentEquals("dc:type")) {
+                	 // Ignore the "dc:" part from the textfield 
                 	 id = id.substring(id.indexOf(":") + 1, id.length());
                 	 String typeField = nodes.item(i).getTextContent().replace("info:eu-repo/semantics/", "");
                 	 doc.add(new TextField(id, typeField, Field.Store.YES));
@@ -228,11 +252,12 @@ public class IndexFilesTraditional {
           catch(Exception e) {
         	  System.out.println(e.toString());
           }
-          
           writer.addDocument(doc);
 
           
-        } finally {
+        } 
+        finally {
+          // Close the reading flows
           fis.close();
           fisCopy.close();
         }

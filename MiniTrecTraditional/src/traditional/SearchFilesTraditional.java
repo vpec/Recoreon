@@ -1,3 +1,13 @@
+/*
+ ***************************************************
+ * Traditional information Retrieval System ********
+ * Authors: Victor Penasco Estivalez - 741294 ******
+ * 			Ruben Rodriguez Esteban  - 737215 ******
+ * Date: 7-11-19 ***********************************
+ ***************************************************
+ */
+
+
 package traditional;
 
 /*
@@ -69,20 +79,29 @@ import opennlp.tools.util.Span;
 /** Simple command-line based search demo. */
 public class SearchFilesTraditional {
 
-	
+	// Hashmap which stores the information needs in tuples <key, valor>
+	// where the key is the id of the need information need andthe valor 
+	// is the content
 	private static HashMap<String, String> infoNeedsMap = new HashMap<>();
 	
+	
+	/**
+	 * Default constructor
+	 */
 	private SearchFilesTraditional() {}
 
+	
+	
 	/** Simple command-line based search demo. */
 	public static void main(String[] args) throws Exception {
 		
-		
+		// Path of the index where de documents are stored
 		String indexPath = "index";
 	    String infoNeedsPath = null;
 	    String resultsPath = null;
 		
-		for(int i=0;i<args.length;i++) {
+	    // Verification of the parameters
+		for(int i = 0; i < args.length; i++) {
 		      if ("-index".equals(args[i])) {
 		        indexPath = args[i+1];
 		        i++;
@@ -97,184 +116,212 @@ public class SearchFilesTraditional {
 		      }
 		}
 		
+		// Store the path of the file with the information needs
 		File fXmlFile = new File(infoNeedsPath);
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 		org.w3c.dom.Document doc = dBuilder.parse(fXmlFile);
-				
+		
+		// Application of the normalization process to the documents
 		doc.getDocumentElement().normalize();
+		// Extract in a list the informationNeed tags 
 		NodeList nList = doc.getElementsByTagName("informationNeed");
-				
+		 
 		for (int temp = 0; temp < nList.getLength(); temp++) {
 			Node nNode = nList.item(temp);		
 			if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 				Element eElement = (Element) nNode;
+				// Adding to the Hashmap the tuple <key, value> where the key is the id of the
+				// information and the value is the content
 				infoNeedsMap.put(eElement.getElementsByTagName("identifier").item(0).getTextContent(),
 								 eElement.getElementsByTagName("text").item(0).getTextContent());
 			}
 		}
 		
+		// Path of the file which is going to store the documents 
 		File resultsFile = new File(resultsPath);
 		FileWriter resultsWriter;
 		
+		// Writing flow associated to the file 
 		resultsWriter = new FileWriter(resultsFile);
 		PrintWriter pw = new PrintWriter(resultsWriter);
 		
-		
+		// Extraction of the current year
 		int currentYear = Calendar.getInstance().get(Calendar.YEAR);
-		
+		String field;
 		for (Entry<String, String> entry : infoNeedsMap.entrySet()) {				
-			System.out.println(entry.getKey());
-			System.out.println(entry.getValue());
-			
-			
-			
-			String field = "contents";
-			
+			field = "contents";
 			IndexReader reader = DirectoryReader.open(FSDirectory.open(Paths.get(indexPath)));
+			
+			// Creation of the searcher and the analyzer
 			IndexSearcher searcher = new IndexSearcher(reader);
 			Analyzer analyzer = new CustomSpanishAnalyzer();
-
 			QueryParser parser = new QueryParser(field, analyzer);
 			BooleanQuery.Builder finalQuery = new BooleanQuery.Builder();
 				
-			// Remove ? and * because they may be confused as wildcard querys
+			// Extraction of the content of each information need and  
+			// removed ? and * characters because they may be confused as wildcard querys
 			String line = entry.getValue().replace("?", "").replace("*", "");
+			// Transform the query to lowerCase in order to make insensitive to uppercase letters
 			String lineLowerCase = line.toLowerCase();
 			
+			// Application of the tokenization process of the query
 			Tokenizer tokenizer = SimpleTokenizer.INSTANCE;
 			String tokens[] = tokenizer.tokenize(line);
 			
+			// flags to detect in the the query are wanted bachelorThesis or masterThesis
 			boolean bachelorThesis = false, masterThesis = false;
 			
-			// Prioritize bachelorThesis
+			/* Prioritize bachelorThesis */
+			// Regex expression to detect bachelorThesis documents
 			if(lineLowerCase.matches(".*(tfg|(trabajos? ?(de)? ?fin ?(de)? ?grado)).*")) {
 				bachelorThesis = true;
-				finalQuery.add(new BoostQuery(parser.parse("type:bachelorThesis"),  2), BooleanClause.Occur.SHOULD);
-	    	}
-			
-			// Prioritize masterThesis
+				finalQuery.add(new BoostQuery(parser.parse("type:bachelorThesis"),  2), 
+					           BooleanClause.Occur.SHOULD);
+	    	}	
+			/* Prioritize masterThesis */
+			// Regex expression to detect masterThesis documents
 			if(lineLowerCase.matches(".*(tfm|tesis|(trabajos? ?(de)? ?fin ?(de)? ?(master|máster))).*")) {
 				masterThesis = true;
-				finalQuery.add(new BoostQuery(parser.parse("type:masterThesis"),  2), BooleanClause.Occur.SHOULD);
+				finalQuery.add(new BoostQuery(parser.parse("type:masterThesis"),  2), 
+						       BooleanClause.Occur.SHOULD);
 	    	}
-			
+			// Path of the Postagger module used to assign tags for each word of the query
 			InputStream modelIn = new FileInputStream("services/es-pos-maxent.bin");
 			POSModel model = new POSModel(modelIn);
 			POSTaggerME tagger = new POSTaggerME(model);
 			String tags[] = tagger.tag(tokens);
+			
+			// Vector of the tokens 
 			List<Integer> dateList = new ArrayList<>();
 			int lowNumber = 0;
+			
 			for(int i = 0; i < tags.length; i++) {
+				// Control if the actual tag corresponds to a number and it's a year between 2000 and 2019
 				if(tags[i].startsWith("Z") && Integer.parseInt(tokens[i]) > 2000 && Integer.parseInt(tokens[i]) <= currentYear) {
 					dateList.add(Integer.parseInt(tokens[i]));
 				}
+				// Control if the actual tag corresponds to a number
 				else if(tags[i].startsWith("Z")){
 					lowNumber = Integer.parseInt(tokens[i]);
 				}
 			}
 			
-			
-			
 			if(!dateList.isEmpty()) {
+				// Controls if the date is only composed by a unique number and the date has the following format
+				// a partir del YEAR
+				// a partir de YEAR
+				// a partir del a�o YEAR
 				if(dateList.size() == 1 && lineLowerCase.matches(".*(a partir del? (año )?[0-9]+).*")) {
-					finalQuery.add(parser.parse("date:[" + ((Integer)(dateList.get(0))).toString() + " TO " + ((Integer)currentYear).toString() + "]"), BooleanClause.Occur.SHOULD);
+					// date ranke like [YEAR TO 2019]
+					finalQuery.add(parser.parse("date:[" + ((Integer)(dateList.get(0))).toString() + " TO " 
+					                                     + ((Integer)currentYear).toString() 
+					                                     + "]"), BooleanClause.Occur.SHOULD);
 				}
+				// Controls if the date is only composed by a two numbers 
 				else if(dateList.size() == 2) {
+					// Extraction of both years
 					Integer lower = dateList.get(0) < dateList.get(1) ? dateList.get(0) : dateList.get(1);
 					Integer upper = lower == dateList.get(0) ? dateList.get(1) : dateList.get(0);
+					// date range like [lower TO upper]
 					finalQuery.add(parser.parse("date:[" + lower.toString() + " TO " + upper.toString() + "]"), BooleanClause.Occur.SHOULD);
 				}
 				else {
+					// Normal cause
 					for(Integer dateElement : dateList) {
 						finalQuery.add(parser.parse("date:" + dateElement.toString()), BooleanClause.Occur.SHOULD);
 					}
 				}
 			}
 			
+			// Case reserved for dates with the following formats:
+			// ultimo ANYO
+			// ultimos ANYO a�os
+			// ultimos a�os
 			if(lineLowerCase.matches(".*(últimos? [0-9]* ?años?).*")){
-				finalQuery.add(parser.parse("date:[" + ((Integer)(currentYear - lowNumber)).toString() + " TO " + ((Integer)currentYear).toString() + "]"), BooleanClause.Occur.SHOULD);
+				// date range like [lower TO upper]
+				finalQuery.add(parser.parse("date:[" + ((Integer)(currentYear - lowNumber)).toString() 
+													 + " TO " + ((Integer)currentYear).toString() 
+													 + "]"), BooleanClause.Occur.SHOULD);
 			}
 			
-			
-			/*
-			 * Z = number
-			 * NC = noun
-			 * V* = verb
-			 */
-			
+			// nameFinder module in order to detect names
 			InputStream modelInNameFinder = new FileInputStream("services/es-ner-person.bin");
 			TokenNameFinderModel modelNameFinder = new TokenNameFinderModel(modelInNameFinder);
 			NameFinderME nameFinder = new NameFinderME(modelNameFinder);
 
 		    Span nameSpans[] = nameFinder.find(tokens);
-		    
 		    if(nameSpans.length > 0) {
 		    	for(Span name : nameSpans) {
+		    		// Control if in the query are this regular expresions 
 		    		if(lineLowerCase.matches(".*(profesor|alumn|tutor|creador).*")) {
-		    			finalQuery.add(new BoostQuery(parser.parse("creator:" + tokens[name.getStart()]), 5), BooleanClause.Occur.SHOULD);
+		    			// Added with a with exponent 5 in order to increase the score of this part of the query
+		    			// because this part is expected to be the author of the doc
+		    			finalQuery.add(new BoostQuery(parser.parse("creator:" + 
+		    					   tokens[name.getStart()]), 5), BooleanClause.Occur.SHOULD);
 			    	}
 		    		else {
-		    			finalQuery.add(new BoostQuery(parser.parse("creator:" + tokens[name.getStart()]), 2), BooleanClause.Occur.SHOULD);
+		    			// Added with a with exponent 2 in order to increase the score of this part of the query
+		    			finalQuery.add(new BoostQuery(parser.parse("creator:" + 
+		    					   tokens[name.getStart()]), 2), BooleanClause.Occur.SHOULD);
 		    		}
 		    		
 			    }
 		    }
-		    System.out.println();
-
 			String lineDescription = "";
 			String lineTitle = "";
 			for(String word : tokens) {
+				// Control if in there is co
 				if(!word.toLowerCase().matches(".*(profesor|alumn|tutor|creador|tfg|tfm|tesis).*") &&
-						!((bachelorThesis || masterThesis) && word.toLowerCase().matches("(trabajos?|fin|grado|máster|master)"))) {
+						!((bachelorThesis || masterThesis) && 
+						   word.toLowerCase().matches("(trabajos?|fin|grado|máster|master)"))) 
+				{
 					lineDescription = lineDescription + " description:" + word;
 					lineTitle = lineTitle + " title:" + word;
 				}
 			}
+			// Extraction of the spaces
 			lineDescription = lineDescription.trim();
 			lineTitle = lineTitle.trim();
-			
 			finalQuery.add(parser.parse(lineDescription), BooleanClause.Occur.SHOULD);
-			finalQuery.add(new BoostQuery(parser.parse(lineTitle), 2), BooleanClause.Occur.SHOULD);
-				
+			finalQuery.add(new BoostQuery(parser.parse(lineTitle), 2), BooleanClause.Occur.SHOULD);	
 			// Execute query
 			Query querySearch = finalQuery.build();
-			
-			System.out.println("Searching for: " + querySearch.toString(field));
-			
-			
+			System.out.println("Searching for: " + querySearch.toString(field));		
+			// Write the results obtained for each query in the results file
 			writeSearchResults(searcher, querySearch, entry.getKey(), pw);
 			
+			// Close the reading flow
 			reader.close();
 		}
+		// Close the writting flow
 		resultsWriter.close();
 	}
 
 		
+	
+	
 	/**
-	 * This demonstrates a typical paging search scenario, where the search engine
-	 * presents pages of size n to the user. The user can then go to the next page
-	 * if interested in the next hits.
-	 * 
-	 * When the query is executed for the first time, then only enough results are
-	 * collected to fill 5 result pages. If the user wants to page beyond this
-	 * limit, then the query is executed another time and all hits are collected.
-	 * 
+	 * @param searcher is the module tasked with executing the query
+	 * @param query is the query which id going to be executed
+	 * @param is the need for information to look for in the query
+	 * @pw is the module printer of the file 
+	 * Stores in the file all the documents which are are related to the query
 	 */
-	public static void writeSearchResults(IndexSearcher searcher, Query query, String infoNeedId, PrintWriter pw) throws IOException {
+	public static void writeSearchResults(IndexSearcher searcher, Query query, String infoNeedId, PrintWriter pw) throws IOException{
+		// Execution of the query
 		TotalHitCountCollector collector = new TotalHitCountCollector();
 		searcher.search(query, collector);
+		// Store de documents found which their scores
 		TopDocs results  = searcher.search(query, Math.max(1, collector.getTotalHits()));
 		ScoreDoc[] hits = results.scoreDocs;
 		int numTotalHits = (int) results.totalHits;
+		// Show the total number of documents found
 		System.out.println(numTotalHits + " total matching documents");
 		for (int i = 0; i < numTotalHits; i++) {
+			// Shows the title of each document found
 			Document doc = searcher.doc(hits[i].doc);
 			pw.println(infoNeedId + "\t" + doc.get("path").replaceFirst(".*/([^/?]+).*", "$1"));
-			if(i < 10) {
-				System.out.println((i + 1) + ". doc=" + hits[i].doc + " path=" + doc.get("path").replaceFirst(".*/([^/?]+).*", "$1") + " score=" + hits[i].score);
-				System.out.println(doc.get("title"));
-			}
 		}
 	}
 }

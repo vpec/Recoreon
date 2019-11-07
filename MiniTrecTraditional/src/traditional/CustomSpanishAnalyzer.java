@@ -1,4 +1,14 @@
 /*
+ ***************************************************
+ * Traditional information Retrieval System ********
+ * Authors: Victor Penasco Estivalez - 741294 ******
+ * 			Ruben Rodriguez Esteban  - 737215 ******
+ * Date: 7-11-19 ***********************************
+ ***************************************************
+ */
+
+
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -36,15 +46,19 @@ import org.apache.lucene.analysis.standard.StandardFilter;
 import org.apache.lucene.analysis.standard.StandardTokenizer;
 import org.apache.lucene.util.IOUtils;
 
+
 /**
  * {@link Analyzer} for Spanish.
  */
 public final class CustomSpanishAnalyzer extends StopwordAnalyzerBase {
+	
 	private final CharArraySet stemExclusionSet;
 
 	/** File containing default Spanish stopwords. */
 	public final static String DEFAULT_STOPWORD_FILE = "services/spanish_stop.txt";
 
+	
+	
 	/**
 	 * Returns an unmodifiable instance of the default stop words set.
 	 * 
@@ -54,6 +68,8 @@ public final class CustomSpanishAnalyzer extends StopwordAnalyzerBase {
 		return DefaultSetHolder.DEFAULT_STOP_SET;
 	}
 
+	
+	
 	/**
 	 * Atomically loads the DEFAULT_STOP_SET in a lazy fashion once the outer class
 	 * accesses the static final set the first time.;
@@ -61,17 +77,22 @@ public final class CustomSpanishAnalyzer extends StopwordAnalyzerBase {
 	private static class DefaultSetHolder {
 		static final CharArraySet DEFAULT_STOP_SET;
 
-	static {
-      try {
-		  DEFAULT_STOP_SET = WordlistLoader.getSnowballWordSet(new FileReader("services/spanish_stop.txt"));
-      } catch (IOException ex) {
-        // default set should always be present as it is part of the
-        // distribution (JAR)
-        throw new RuntimeException("Unable to load default stopword set");
-      }
-    }
+		
+		static {
+			try {
+				// Configuration of the path of the file which contains the stop words
+				DEFAULT_STOP_SET = WordlistLoader.getSnowballWordSet(new FileReader("services/spanish_stop.txt"));
+			} 
+			catch (IOException ex) {
+				// default set should always be present as it is part of the distribution (JAR)
+				throw new RuntimeException("Unable to load default stopword set");
+			}
+		}
 	}
 
+	
+	
+	
 	/**
 	 * Builds an analyzer with the default stop words:
 	 * {@link #DEFAULT_STOPWORD_FILE}.
@@ -80,6 +101,9 @@ public final class CustomSpanishAnalyzer extends StopwordAnalyzerBase {
 		this(DefaultSetHolder.DEFAULT_STOP_SET);
 	}
 
+	
+	
+	
 	/**
 	 * Builds an analyzer with the given stop words.
 	 * 
@@ -89,6 +113,9 @@ public final class CustomSpanishAnalyzer extends StopwordAnalyzerBase {
 		this(stopwords, CharArraySet.EMPTY_SET);
 	}
 
+	
+	
+	
 	/**
 	 * Builds an analyzer with the given stop words. If a non-empty stem exclusion
 	 * set is provided this analyzer will add a {@link SetKeywordMarkerFilter}
@@ -102,6 +129,9 @@ public final class CustomSpanishAnalyzer extends StopwordAnalyzerBase {
 		this.stemExclusionSet = CharArraySet.unmodifiableSet(CharArraySet.copy(stemExclusionSet));
 	}
 
+	
+	
+	
 	/**
 	 * Creates a {@link org.apache.lucene.analysis.Analyzer.TokenStreamComponents}
 	 * which tokenizes all the text in the provided {@link Reader}.
@@ -124,6 +154,9 @@ public final class CustomSpanishAnalyzer extends StopwordAnalyzerBase {
 		return new TokenStreamComponents(source, result);
 	}
 
+	
+	
+	
 	@Override
 	protected TokenStream normalize(String fieldName, TokenStream in) {
 		TokenStream result = new StandardFilter(in);
