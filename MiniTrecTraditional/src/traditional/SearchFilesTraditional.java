@@ -140,40 +140,47 @@ public class SearchFilesTraditional {
 				
 			// Remove ? and * because they may be confused as wildcard querys
 			String line = entry.getValue().replace("?", "").replace("*", "");
-			line = line.toLowerCase();
-			System.out.println(line);
+			String lineLowerCase = line.toLowerCase();
 			
 			Tokenizer tokenizer = SimpleTokenizer.INSTANCE;
 			String tokens[] = tokenizer.tokenize(line);
 			
-			List<String> tokensList = Arrays.asList(tokens);
+			boolean bachelorThesis = false, masterThesis = false;
 			
 			// Prioritize bachelorThesis
-			if(tokensList.contains("tfg") || tokensList.contains("tfgs") || 
-					(tokensList.contains("fin") && tokensList.contains("grado"))){
+			if(lineLowerCase.matches(".*(tfg|(trabajos? ?(de)? ?fin ?(de)? ?grado)).*")) {
+				bachelorThesis = true;
 				finalQuery.add(new BoostQuery(parser.parse("type:bachelorThesis"),  2), BooleanClause.Occur.SHOULD);
-			}
+	    	}
 			
 			// Prioritize masterThesis
-			if(tokensList.contains("tesis") || tokensList.contains("tfm") || tokensList.contains("tfms") ||
-					(tokensList.contains("fin") && (tokensList.contains("máster") || tokensList.contains("master")))){
-				finalQuery.add(new BoostQuery(parser.parse("type:masterThesis"), 2), BooleanClause.Occur.SHOULD);
-			}
-			
+			if(lineLowerCase.matches(".*(tfm|tesis|(trabajos? ?(de)? ?fin ?(de)? ?(master|máster))).*")) {
+				masterThesis = true;
+				finalQuery.add(new BoostQuery(parser.parse("type:masterThesis"),  2), BooleanClause.Occur.SHOULD);
+	    	}
 			
 			InputStream modelIn = new FileInputStream("services/es-pos-maxent.bin");
 			POSModel model = new POSModel(modelIn);
 			POSTaggerME tagger = new POSTaggerME(model);
 			String tags[] = tagger.tag(tokens);
 			List<Integer> dateList = new ArrayList<>();
+			int lowNumber = 0;
 			for(int i = 0; i < tags.length; i++) {
 				if(tags[i].startsWith("Z") && Integer.parseInt(tokens[i]) > 2000 && Integer.parseInt(tokens[i]) <= currentYear) {
 					dateList.add(Integer.parseInt(tokens[i]));
 				}
+				else if(tags[i].startsWith("Z")){
+					lowNumber = Integer.parseInt(tokens[i]);
+				}
 			}
 			
+			
+			
 			if(!dateList.isEmpty()) {
-				if(dateList.size() == 2) {
+				if(dateList.size() == 1 && lineLowerCase.matches(".*(a partir del? (año )?[0-9]+).*")) {
+					finalQuery.add(parser.parse("date:[" + ((Integer)(dateList.get(0))).toString() + " TO " + ((Integer)currentYear).toString() + "]"), BooleanClause.Occur.SHOULD);
+				}
+				else if(dateList.size() == 2) {
 					Integer lower = dateList.get(0) < dateList.get(1) ? dateList.get(0) : dateList.get(1);
 					Integer upper = lower == dateList.get(0) ? dateList.get(1) : dateList.get(0);
 					finalQuery.add(parser.parse("date:[" + lower.toString() + " TO " + upper.toString() + "]"), BooleanClause.Occur.SHOULD);
@@ -183,6 +190,10 @@ public class SearchFilesTraditional {
 						finalQuery.add(parser.parse("date:" + dateElement.toString()), BooleanClause.Occur.SHOULD);
 					}
 				}
+			}
+			
+			if(lineLowerCase.matches(".*(últimos? [0-9]* ?años?).*")){
+				finalQuery.add(parser.parse("date:[" + ((Integer)(currentYear - lowNumber)).toString() + " TO " + ((Integer)currentYear).toString() + "]"), BooleanClause.Occur.SHOULD);
 			}
 			
 			
@@ -200,16 +211,25 @@ public class SearchFilesTraditional {
 		    
 		    if(nameSpans.length > 0) {
 		    	for(Span name : nameSpans) {
-			    	finalQuery.add(new BoostQuery(parser.parse("creator:" + tokens[name.getStart()]), 2), BooleanClause.Occur.SHOULD);
+		    		if(lineLowerCase.matches(".*(profesor|alumn|tutor|creador).*")) {
+		    			finalQuery.add(new BoostQuery(parser.parse("creator:" + tokens[name.getStart()]), 5), BooleanClause.Occur.SHOULD);
+			    	}
+		    		else {
+		    			finalQuery.add(new BoostQuery(parser.parse("creator:" + tokens[name.getStart()]), 2), BooleanClause.Occur.SHOULD);
+		    		}
+		    		
 			    }
-		    }		    
-
+		    }
+		    System.out.println();
 
 			String lineDescription = "";
 			String lineTitle = "";
 			for(String word : tokens) {
-				lineDescription = lineDescription + " description:" + word;
-				lineTitle = lineTitle + " title:" + word;
+				if(!word.toLowerCase().matches(".*(profesor|alumn|tutor|creador|tfg|tfm|tesis).*") &&
+						!((bachelorThesis || masterThesis) && word.toLowerCase().matches("(trabajos?|fin|grado|máster|master)"))) {
+					lineDescription = lineDescription + " description:" + word;
+					lineTitle = lineTitle + " title:" + word;
+				}
 			}
 			lineDescription = lineDescription.trim();
 			lineTitle = lineTitle.trim();
@@ -220,9 +240,7 @@ public class SearchFilesTraditional {
 			// Execute query
 			Query querySearch = finalQuery.build();
 			
-//			Query query = parser.parse(line);
 			System.out.println("Searching for: " + querySearch.toString(field));
-			
 			
 			
 			writeSearchResults(searcher, querySearch, entry.getKey(), pw);
@@ -252,9 +270,10 @@ public class SearchFilesTraditional {
 		System.out.println(numTotalHits + " total matching documents");
 		for (int i = 0; i < numTotalHits; i++) {
 			Document doc = searcher.doc(hits[i].doc);
-			pw.println(infoNeedId + "\t" + doc.get("path"));
+			pw.println(infoNeedId + "\t" + doc.get("path").replaceFirst(".*/([^/?]+).*", "$1"));
 			if(i < 10) {
-				System.out.println((i + 1) + ". doc=" + hits[i].doc + " path=" + doc.get("path") + " score=" + hits[i].score);
+				System.out.println((i + 1) + ". doc=" + hits[i].doc + " path=" + doc.get("path").replaceFirst(".*/([^/?]+).*", "$1") + " score=" + hits[i].score);
+				System.out.println(doc.get("title"));
 			}
 		}
 	}
