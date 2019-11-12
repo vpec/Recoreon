@@ -76,8 +76,9 @@ import opennlp.tools.tokenize.TokenizerME;
 import opennlp.tools.tokenize.TokenizerModel;
 import opennlp.tools.util.Span;
 
+
 /** Simple command-line based search demo. */
-public class SearchFilesTraditional {
+public class SearchFiles {
 
 	// Hashmap which stores the information needs in tuples <key, valor>
 	// where the key is the id of the need information need andthe valor 
@@ -88,7 +89,7 @@ public class SearchFilesTraditional {
 	/**
 	 * Default constructor
 	 */
-	private SearchFilesTraditional() {}
+	private SearchFiles() {}
 
 	
 	
@@ -211,7 +212,7 @@ public class SearchFilesTraditional {
 				// Controls if the date is only composed by a unique number and the date has the following format
 				// a partir del YEAR
 				// a partir de YEAR
-				// a partir del año YEAR
+				// a partir del aï¿½o YEAR
 				if(dateList.size() == 1 && lineLowerCase.matches(".*(a partir del? (aÃ±o )?[0-9]+).*")) {
 					// date ranke like [YEAR TO 2019]
 					finalQuery.add(parser.parse("date:[" + ((Integer)(dateList.get(0))).toString() + " TO " 
@@ -236,8 +237,8 @@ public class SearchFilesTraditional {
 			
 			// Case reserved for dates with the following formats:
 			// ultimo ANYO
-			// ultimos ANYO años
-			// ultimos años
+			// ultimos ANYO aï¿½os
+			// ultimos aï¿½os
 			if(lineLowerCase.matches(".*(Ãºltimos? [0-9]* ?aÃ±os?).*")){
 				// date range like [lower TO upper]
 				finalQuery.add(parser.parse("date:[" + ((Integer)(currentYear - lowNumber)).toString() 
@@ -255,13 +256,13 @@ public class SearchFilesTraditional {
 		    	for(Span name : nameSpans) {
 		    		// Control if in the query are this regular expresions 
 		    		if(lineLowerCase.matches(".*(profesor|alumn|tutor|creador).*")) {
-		    			// Added with a with exponent 5 in order to increase the score of this part of the query
+		    			// Added with exponent 5 in order to increase the score of this part of the query
 		    			// because this part is expected to be the author of the doc
 		    			finalQuery.add(new BoostQuery(parser.parse("creator:" + 
 		    					   tokens[name.getStart()]), 5), BooleanClause.Occur.SHOULD);
 			    	}
 		    		else {
-		    			// Added with a with exponent 2 in order to increase the score of this part of the query
+		    			// Added with exponent 2 in order to increase the score of this part of the query
 		    			finalQuery.add(new BoostQuery(parser.parse("creator:" + 
 		    					   tokens[name.getStart()]), 2), BooleanClause.Occur.SHOULD);
 		    		}
@@ -271,7 +272,7 @@ public class SearchFilesTraditional {
 			String lineDescription = "";
 			String lineTitle = "";
 			for(String word : tokens) {
-				// Control if in there is co
+				// Control if word matches any of these regex
 				if(!word.toLowerCase().matches(".*(profesor|alumn|tutor|creador|tfg|tfm|tesis).*") &&
 						!((bachelorThesis || masterThesis) && 
 						   word.toLowerCase().matches("(trabajos?|fin|grado|mÃ¡ster|master)"))) 
@@ -287,7 +288,7 @@ public class SearchFilesTraditional {
 			finalQuery.add(new BoostQuery(parser.parse(lineTitle), 2), BooleanClause.Occur.SHOULD);	
 			// Execute query
 			Query querySearch = finalQuery.build();
-			System.out.println("Searching for: " + querySearch.toString(field));		
+			System.out.println("Querying information need " + entry.getKey() + ": " + entry.getValue());		
 			// Write the results obtained for each query in the results file
 			writeSearchResults(searcher, querySearch, entry.getKey(), pw);
 			
@@ -296,6 +297,7 @@ public class SearchFilesTraditional {
 		}
 		// Close the writting flow
 		resultsWriter.close();
+		System.out.println("Search finished");
 	}
 
 		

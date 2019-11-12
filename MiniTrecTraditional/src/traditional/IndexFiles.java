@@ -63,19 +63,20 @@ import java.util.Date;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+
 /** Index all text files under a directory.
  * <p>
  * This is a command-line application demonstrating simple Lucene indexing.
  * Run it with no command-line arguments for usage information.
  */
-public class IndexFilesTraditional {
+public class IndexFiles {
   
 	
 
   /**
    * Default constructor of the class
    */
-  private IndexFilesTraditional() {}
+  private IndexFiles() {}
 
   
   

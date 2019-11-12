@@ -20,8 +20,20 @@ public class Evaluation {
 	
 	private static HashMap<String, List<String>> resultsMap = new HashMap<>();
 	
+	private static HashMap<Float, Float> recall_precisionMap = new HashMap<>();
+	
+	private static Float fixedRecallList[] = { 0.0F, 0.1F, 0.2F, 0.3F, 0.4F, 0.5F, 0.6F, 0.7F, 0.8F, 0.9F, 1.0F};
+	
+	private static List<Float> precisionList = new ArrayList<>();
+	private static List<Float> recallList = new ArrayList<>();
+	private static List<Float> f1List = new ArrayList<>();
+	private static List<Float> precAt10List = new ArrayList<>();
+	private static List<List<Float>> precisionInterpolatedList = new ArrayList<>();
+	
+	
 	// Evaluation metrics
 	private static float tp, fp, fn, precision, recall, f1balanced;
+	private static List<Integer> relDocumentsList;
 
 	public static void main(String[] args) {
 		String usage = "java org.apache.lucene.demo.IndexFiles"
@@ -105,6 +117,7 @@ public class Evaluation {
 				precision = 0;
 				recall = 0;
 				f1balanced = 0;
+				relDocumentsList =  new ArrayList<>();
 				calculateBasicMetrics(entry.getKey());
 				precision();
 				recall();
@@ -115,10 +128,28 @@ public class Evaluation {
 			    pw.println("F1 " + String.valueOf(f1balanced));
 			    pw.println("prec@10 " + precAt10(entry.getKey()));
 			    pw.println("average_precision " + average_precision(entry.getKey()));
-//			    pw.println("interpolated_recall_precision " + average_precision());
+			    pw.println("recall_precision");
+			    recall_precision(entry.getKey(), pw);
+			    pw.println("interpolated_recall_precision");
+			    interpolated_recall_precision(entry.getKey(), pw);
 			    pw.println();
 			    
 			}
+			
+			pw.println("TOTAL");
+		    pw.println("precision " + precisionList.stream().mapToDouble(val -> val).average().toString());
+		    pw.println("recall " + recallList.stream().mapToDouble(val -> val).average().toString());
+		    pw.println("F1 " + f1List.stream().mapToDouble(val -> val).average().toString());
+		    pw.println("prec@10 " + precAt10List.stream().mapToDouble(val -> val).average().toString());
+		    //pw.println("average_precision " + average_precision(entry.getKey()));
+		    // MAP
+		    pw.println("interpolated_recall_precision");
+		    int i = 0;
+		    for(List<Float> element : precisionInterpolatedList) {
+		    	pw.println("prec@10 " + fixedRecallList[i].toString() + " " + element.stream().mapToDouble(val -> val).average().toString());
+		    	i++;
+		    }
+		    pw.println();
 			
 			outputWriter.close();
 						
@@ -133,20 +164,25 @@ public class Evaluation {
 			// If system returned any docs for infNeed
 			HashMap<String, String> qrelsInnerMap = qrelsMap.get(infNeed);
 			List<String> resultsList = resultsMap.get(infNeed);
+			int docIndex = 1;
 			for (String docId: resultsList) {
 				if (qrelsInnerMap.containsKey(docId)) {
 					if(qrelsInnerMap.get(docId).equals("1")) { // If doc is relevant
 						tp++;
+						relDocumentsList.add(docIndex);
 					}
 					else {
 						fp++;
 					}
 				}
+				docIndex++;
 		    }
+			
 			for (Entry<String, String> entry : qrelsInnerMap.entrySet()) {
 				if(entry.getValue().equals("1") && !resultsList.contains(entry.getKey())) {
 					fn++;
-				}
+				}				
+				
 			}
 		}
 		
@@ -155,14 +191,17 @@ public class Evaluation {
 	
 	private static void precision() {
 		precision = tp / (tp + fp);
+		precisionList.add(precision);
 	}
 	
 	private static void recall() {
 		recall = tp / (tp + fn);
+		recallList.add(recall);
 	}
 	
 	private static void f1balanced() {
 		f1balanced = (2 * precision * recall) / (precision + recall);
+		f1List.add(f1balanced);
 	}
 	
 	private static String precAt10(String infNeed) {
@@ -179,6 +218,7 @@ public class Evaluation {
 				}
 		    }
 		}
+		precAt10List.add(tp10 / 10);
 		return String.valueOf(tp10 / 10);
 	}
 	
@@ -219,5 +259,36 @@ public class Evaluation {
 		return tpk / k;
 	}
 	
+	private static void recall_precision(String infNeed, PrintWriter pw) {
+		float recallPerDocument = recall / relDocumentsList.size();
+		float acumulatedRecall = 0;
+		for(Integer docIndex : relDocumentsList) {
+			acumulatedRecall += recallPerDocument;
+			recall_precisionMap.put(acumulatedRecall, precAtK(infNeed, docIndex));
+			pw.format("%.3f%s%.3f%s", acumulatedRecall, " ", precAtK(infNeed, docIndex), "\n");
+			//pw.println(acumulatedRecall + " " + precAtK(infNeed, docIndex));
+		}
+	}
+	
+	
+	private static void interpolated_recall_precision(String infNeed, PrintWriter pw) {
+		Float maxPrecision;
+		precisionInterpolatedList.add(new ArrayList<>());
+		for(int i = 0; i < fixedRecallList.length; i++) {
+			maxPrecision = 0.0F;
+			for (Entry<Float, Float> entry : recall_precisionMap.entrySet()) {
+				if(fixedRecallList[i] <= entry.getKey()) {
+					if(entry.getValue() > maxPrecision) {
+						maxPrecision = entry.getValue();
+					}
+				}
+			}
+			precisionInterpolatedList.get(precisionInterpolatedList.size() - 1).add(maxPrecision);
+			pw.format("%.3f%s%.3f%s", fixedRecallList[i], " ", maxPrecision, "\n");
+		}
+		
+
+		
+	}
 
 }
