@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import javax.swing.text.html.HTMLDocument.Iterator;
 
@@ -22,7 +23,9 @@ public class Evaluation {
 	
 	private static HashMap<Float, Float> recall_precisionMap = new HashMap<>();
 	
-	private static Float fixedRecallList[] = { 0.0F, 0.1F, 0.2F, 0.3F, 0.4F, 0.5F, 0.6F, 0.7F, 0.8F, 0.9F, 1.0F};
+	private static TreeMap<Float, List<Float>> fixedRecallList = new TreeMap<>();
+	
+	private static List<Float> average_precisionList = new ArrayList<>();
 	
 	private static List<Float> precisionList = new ArrayList<>();
 	private static List<Float> recallList = new ArrayList<>();
@@ -108,6 +111,11 @@ public class Evaluation {
 			outputWriter = new FileWriter(outputFile);
 			PrintWriter pw = new PrintWriter(outputWriter);
 			
+			// Initialize fixedRecallList
+			for(int i = 0; i <= 10; i++) {
+				fixedRecallList.put(((float)i)/10.f, new ArrayList<>());
+			}
+			
 			// What happens if not all information needs have been judged or appear in results?
 			for (Entry<String, HashMap<String, String>> entry : qrelsMap.entrySet()) {
 				// Initialize basic metrics values
@@ -137,18 +145,16 @@ public class Evaluation {
 			}
 			
 			pw.println("TOTAL");
-		    pw.println("precision " + precisionList.stream().mapToDouble(val -> val).average().toString());
-		    pw.println("recall " + recallList.stream().mapToDouble(val -> val).average().toString());
-		    pw.println("F1 " + f1List.stream().mapToDouble(val -> val).average().toString());
-		    pw.println("prec@10 " + precAt10List.stream().mapToDouble(val -> val).average().toString());
-		    //pw.println("average_precision " + average_precision(entry.getKey()));
-		    // MAP
+			pw.format("%s%.3f%s", "precision ", precisionList.stream().mapToDouble(val -> val).average().getAsDouble(), "\n");
+		    pw.format("%s%.3f%s", "recall ", recallList.stream().mapToDouble(val -> val).average().getAsDouble(), "\n");
+		    pw.format("%s%.3f%s", "F1 ", f1List.stream().mapToDouble(val -> val).average().getAsDouble(), "\n");
+		    pw.format("%s%.3f%s", "prec@10 ", precAt10List.stream().mapToDouble(val -> val).average().getAsDouble(), "\n");
+		    pw.format("%s%.3f%s", "MAP ", average_precisionList.stream().mapToDouble(val -> val).average().getAsDouble(), "\n");
 		    pw.println("interpolated_recall_precision");
-		    int i = 0;
-		    for(List<Float> element : precisionInterpolatedList) {
-		    	pw.println("prec@10 " + fixedRecallList[i].toString() + " " + element.stream().mapToDouble(val -> val).average().toString());
-		    	i++;
+		    for (Entry<Float, List<Float>> entry : fixedRecallList.entrySet()) {
+		    	pw.format("%.3f%s%.3f%s",entry.getKey(), " ",  entry.getValue().stream().mapToDouble(val -> val).average().getAsDouble(), "\n");
 		    }
+
 		    pw.println();
 			
 			outputWriter.close();
@@ -238,6 +244,7 @@ public class Evaluation {
 				}
 		    }
 		}
+		average_precisionList.add(meanPrecision / numRelDocs);
 		return String.valueOf(meanPrecision / numRelDocs);
 		
 	}
@@ -274,20 +281,19 @@ public class Evaluation {
 	private static void interpolated_recall_precision(String infNeed, PrintWriter pw) {
 		Float maxPrecision;
 		precisionInterpolatedList.add(new ArrayList<>());
-		for(int i = 0; i < fixedRecallList.length; i++) {
+		for (Entry<Float, List<Float>> entry : fixedRecallList.entrySet()) {
 			maxPrecision = 0.0F;
-			for (Entry<Float, Float> entry : recall_precisionMap.entrySet()) {
-				if(fixedRecallList[i] <= entry.getKey()) {
-					if(entry.getValue() > maxPrecision) {
-						maxPrecision = entry.getValue();
+			for (Entry<Float, Float> entryMap : recall_precisionMap.entrySet()) {
+				if(entry.getKey() <= entryMap.getKey()) {
+					if(entryMap.getValue() > maxPrecision) {
+						maxPrecision = entryMap.getValue();
 					}
 				}
 			}
-			precisionInterpolatedList.get(precisionInterpolatedList.size() - 1).add(maxPrecision);
-			pw.format("%.3f%s%.3f%s", fixedRecallList[i], " ", maxPrecision, "\n");
+			pw.format("%.3f%s%.3f%s", entry.getKey(), " ", maxPrecision, "\n");
+			entry.getValue().add(maxPrecision);
+			
 		}
-		
-
 		
 	}
 
