@@ -29,7 +29,6 @@ public class Evaluation {
 	
 	private static List<Float> precisionList = new ArrayList<>();
 	private static List<Float> recallList = new ArrayList<>();
-	private static List<Float> f1List = new ArrayList<>();
 	private static List<Float> precAt10List = new ArrayList<>();
 	private static List<List<Float>> precisionInterpolatedList = new ArrayList<>();
 	
@@ -145,9 +144,11 @@ public class Evaluation {
 			}
 			
 			pw.println("TOTAL");
-			pw.format("%s%.3f%s", "precision ", precisionList.stream().mapToDouble(val -> val).average().getAsDouble(), "\n");
-		    pw.format("%s%.3f%s", "recall ", recallList.stream().mapToDouble(val -> val).average().getAsDouble(), "\n");
-		    pw.format("%s%.3f%s", "F1 ", f1List.stream().mapToDouble(val -> val).average().getAsDouble(), "\n");
+			precision = (float) precisionList.stream().mapToDouble(val -> val).average().getAsDouble();
+			pw.format("%s%.3f%s", "precision ", precision, "\n");
+			recall = (float) recallList.stream().mapToDouble(val -> val).average().getAsDouble();
+		    pw.format("%s%.3f%s", "recall ", recall, "\n");
+		    pw.format("%s%.3f%s", "F1 ", (2 * precision * recall) / (precision + recall), "\n");
 		    pw.format("%s%.3f%s", "prec@10 ", precAt10List.stream().mapToDouble(val -> val).average().getAsDouble(), "\n");
 		    pw.format("%s%.3f%s", "MAP ", average_precisionList.stream().mapToDouble(val -> val).average().getAsDouble(), "\n");
 		    pw.println("interpolated_recall_precision");
@@ -210,7 +211,6 @@ public class Evaluation {
 	
 	private static void f1balanced() {
 		f1balanced = (2 * precision * recall) / (precision + recall);
-		f1List.add(f1balanced);
 	}
 	
 	private static String precAt10(String infNeed) {
@@ -272,6 +272,7 @@ public class Evaluation {
 	private static void recall_precision(String infNeed, PrintWriter pw) {
 		float recallPerDocument = recall / relDocumentsList.size();
 		float acumulatedRecall = 0;
+		recall_precisionMap = new HashMap<>();
 		for(Integer docIndex : relDocumentsList) {
 			acumulatedRecall += recallPerDocument;
 			recall_precisionMap.put(acumulatedRecall, precAtK(infNeed, docIndex));
