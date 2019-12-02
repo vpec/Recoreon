@@ -17,8 +17,6 @@ import javax.swing.text.html.HTMLDocument.Iterator;
 
 public class Evaluation {
 	
-	private static int MAX_RESULTS = 45;
-	
 	private static HashMap<String, HashMap<String, String>> qrelsMap = new HashMap<>();
 	
 	private static HashMap<String, List<String>> resultsMap = new HashMap<>();
@@ -88,8 +86,7 @@ public class Evaluation {
 			}
 			
 			// Read results file
-			int i = 0;
-			while (((line = resultsBr.readLine()) != null) && i < MAX_RESULTS) {
+			while (((line = resultsBr.readLine()) != null)) {
 				String[] elements = line.split("\\s+");
 				if (!resultsMap.containsKey(elements[0])) {
 					resultsMap.put(elements[0], new ArrayList<>());
@@ -183,6 +180,9 @@ public class Evaluation {
 					else {
 						fp++;
 					}
+				}
+				else {
+					fp++;
 				}
 				docIndex++;
 		    }
