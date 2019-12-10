@@ -1,11 +1,31 @@
 <rdf:RDF
     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-    xmlns:vcard="http://www.w3.org/2001/vcard-rdf/3.0#">
-  <rdf:Description rdf:about="http://somewhere/JohnSmith">
+    xmlns:vcard="http://www.w3.org/2001/vcard-rdf/3.0#"
+    xmlns:j.0="http://xmlns.com/foaf/0.1/">
+  <j.0:person rdf:about="http://somewhere/JohnSmith">
+    <j.0:knows>
+      <rdf:Description rdf:about="http://somewhere/JohnLennon">
+        <j.0:knows>
+          <rdf:Description rdf:about="http://somewhere/JohnCena">
+            <j.0:knows rdf:resource="http://somewhere/JohnLennon"/>
+            <vcard:N rdf:parseType="Resource">
+              <vcard:Family>Cena</vcard:Family>
+              <vcard:Given>John</vcard:Given>
+            </vcard:N>
+            <vcard:FN>John Cena</vcard:FN>
+          </rdf:Description>
+        </j.0:knows>
+        <vcard:N rdf:parseType="Resource">
+          <vcard:Family>Lennon</vcard:Family>
+          <vcard:Given>John</vcard:Given>
+        </vcard:N>
+        <vcard:FN>John Lennon</vcard:FN>
+      </rdf:Description>
+    </j.0:knows>
     <vcard:N rdf:parseType="Resource">
       <vcard:Family>Smith</vcard:Family>
       <vcard:Given>John</vcard:Given>
     </vcard:N>
     <vcard:FN>John Smith</vcard:FN>
-  </rdf:Description>
+  </j.0:person>
 </rdf:RDF>
