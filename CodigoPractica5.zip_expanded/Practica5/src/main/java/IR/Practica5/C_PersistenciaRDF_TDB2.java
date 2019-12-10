@@ -45,12 +45,17 @@ public class C_PersistenciaRDF_TDB2 {
 		
 		// Retrieve model
 		Model model2 =  FileManager.get().loadModel("nombre.rdf","RDF/XML-ABBREV");
-		//creamos un tdb (triplet data base) para almacenar el modelo
-		//el borrado del directorio es para que se cree de cero en cada ejecución
-//		String directory2 = "DB2";
-//		FileUtils.deleteDirectory(new File(directory2));
-//		Dataset data2 = TDB2Factory.connectDataset(directory2);
-//		DatasetGraph data3 = (DatasetGraph) RDFDataMgr.loadGraph(model2.toString());
+		
+		//hacemos una transacción de escritura y confirmamos los cambios
+		data.begin(ReadWrite.WRITE) ;
+		data.addNamedModel("nombre.rdf", model2);
+		data.commit();
+		data.end();
+		
+		//Leer modelo
+		data.begin(ReadWrite.READ);
+		System.out.println(data.asDatasetGraph().toString());
+		data.end();
 		
 	}
 	
