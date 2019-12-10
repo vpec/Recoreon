@@ -5,6 +5,7 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.vocabulary.VCARD;
 
 /**
@@ -80,6 +81,10 @@ public class A_CreacionRDF {
                 .addProperty(propertyKnows, johnLennon);
         // And viceversa
         johnLennon.addProperty(propertyKnows, johnCena);
+        
+        // Create new statement (john smith knows john lennon)
+        Statement statement = ResourceFactory.createStatement(johnSmith, propertyKnows, johnLennon);
+        model.add(statement);
         
         return model;
 	}
