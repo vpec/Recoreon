@@ -91,25 +91,17 @@ public class D_AccesoRDF {
 		it = res.listProperties();
 		while (it.hasNext()) {
 			Statement st = it.next();
-			System.
 			// mostramos todos los recursos que contienen una propiedad determinada
-			prop = model
-					.getProperty(st.toString());
-			ri = model.listSubjectsWithProperty(prop);
+						
+			Property prop1 = model
+					.getProperty(st.getPredicate().toString());
+			ri = model.listSubjectsWithProperty(prop1);
+			
 			while (ri.hasNext()) {
 				Resource r = ri.next();
 				System.out.println(r.getURI());
 			}
-			
-//			if (st.getObject().isLiteral()) {
-//				System.out.println(st.getSubject().getURI() + " - "
-//						+ st.getPredicate().getURI() + " - "
-//						+ st.getLiteral().toString());
-//			} else {
-//				System.out.println(st.getSubject().getURI() + " - "
-//						+ st.getPredicate().getURI() + " - "
-//						+ st.getResource().getURI());
-//			}
+		
 		}
 		
 		
