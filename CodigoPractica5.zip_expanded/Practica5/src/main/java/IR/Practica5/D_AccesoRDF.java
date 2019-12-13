@@ -80,6 +80,39 @@ public class D_AccesoRDF {
 						+ st.getLiteral().toString());
 			}
 		}
+		
+		// Monstramos todos los recursos que contienen las alguna propiedad compartida con uri
+		String uri = "http://dig.csail.mit.edu/2008/webdav/timbl/foaf.rdf";
+		System.out.println("----------------------------------------");
+		System.out.println("SHOW ALL RESOURCES THAT SHARE PROPERTIES WITH " + uri);
+		// obtenemos los valores de todas las propiedades de un recurso
+		res = model
+				.getResource("http://dig.csail.mit.edu/2008/webdav/timbl/foaf.rdf");
+		it = res.listProperties();
+		while (it.hasNext()) {
+			Statement st = it.next();
+			System.
+			// mostramos todos los recursos que contienen una propiedad determinada
+			prop = model
+					.getProperty(st.toString());
+			ri = model.listSubjectsWithProperty(prop);
+			while (ri.hasNext()) {
+				Resource r = ri.next();
+				System.out.println(r.getURI());
+			}
+			
+//			if (st.getObject().isLiteral()) {
+//				System.out.println(st.getSubject().getURI() + " - "
+//						+ st.getPredicate().getURI() + " - "
+//						+ st.getLiteral().toString());
+//			} else {
+//				System.out.println(st.getSubject().getURI() + " - "
+//						+ st.getPredicate().getURI() + " - "
+//						+ st.getResource().getURI());
+//			}
+		}
+		
+		
 	}
 
 }
