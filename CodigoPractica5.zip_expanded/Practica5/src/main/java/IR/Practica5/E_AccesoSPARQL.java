@@ -81,6 +81,69 @@ public class E_AccesoSPARQL {
 		qexec.close() ;
 		resultModel.write(System.out);
 		
+		System.out.println("5.2");
+		System.out.println("----------------------------------------");
+		
+		
+		// cargamos el fichero deseado
+		model = FileManager.get().loadModel("card.rdf");
+
+		queryString = "Select ?x ?y ?z WHERE {" +
+					  " ?x ?y ?z ." +
+					  "FILTER regex (?z, 'Berners-Lee')" +
+					  "}";
+		
+		
+		query = QueryFactory.create(queryString) ;
+		qexec = QueryExecutionFactory.create(query, model) ;
+		try {
+			ResultSet results = qexec.execSelect() ;
+			for ( ; results.hasNext() ; )
+			{
+				QuerySolution soln = results.nextSolution() ;
+				Resource x = soln.getResource("x");
+				Resource y = soln.getResource("y");
+				RDFNode z = soln.get("z") ; 
+				if (z.isLiteral()) {
+					System.out.println(x.getURI() + " - "
+							+ y.getURI() + " - "
+							+ z.toString());
+				} else {
+					System.out.println(x.getURI() + " - "
+							+ y.getURI() + " - "
+							+ z.asResource().getURI());
+				}
+			}
+		} finally { qexec.close() ; }
+		
+		
+		System.out.println("5.3");
+		System.out.println("----------------------------------------");
+		
+		
+		// cargamos el fichero deseado
+		model = FileManager.get().loadModel("card.rdf");
+
+		
+	    
+		queryString = "PREFIX dc: <http://purl.org/dc/elements/1.1/>" + 
+				      "Select ?title WHERE {" +
+					  " ?x dc:creator <http://www.w3.org/People/Berners-Lee/card#i> ." +
+					  " ?x dc:title ?title ." +
+					  "}";
+		
+		
+		query = QueryFactory.create(queryString) ;
+		qexec = QueryExecutionFactory.create(query, model) ;
+		try {
+			ResultSet results = qexec.execSelect() ;
+			for ( ; results.hasNext() ; )
+			{
+				QuerySolution soln = results.nextSolution() ;
+				RDFNode z = soln.get("title") ; 
+				System.out.println(z.toString());
+			}
+		} finally { qexec.close() ; }
 	}
 	
 }
