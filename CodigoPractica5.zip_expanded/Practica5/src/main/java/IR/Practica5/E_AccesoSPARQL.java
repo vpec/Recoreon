@@ -144,6 +144,20 @@ public class E_AccesoSPARQL {
 				System.out.println(z.toString());
 			}
 		} finally { qexec.close() ; }
+		
+		
+		System.out.println("5.4");
+		System.out.println("----------------------------------------");
+		//definimos la consulta (tipo cosntruct)
+		queryString = "PREFIX dc: <http://purl.org/dc/elements/1.1/>" +
+				      "construct {?x ?z ?y} where {?x ?z ?y ." +
+				      "?x dc:creator <http://www.w3.org/People/Berners-Lee/card#i>}" ;
+		
+		query = QueryFactory.create(queryString) ;
+		qexec = QueryExecutionFactory.create(query, model) ;
+		resultModel = qexec.execConstruct() ;
+		qexec.close() ;
+		resultModel.write(System.out, "TURTLE");
 	}
 	
 }
