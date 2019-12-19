@@ -2,86 +2,128 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix dc: <http://purl.org/dc/elements/1.1/> .
 @prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix m: <http://github.com/vpec/Recoreon/> .
 
-<Documento>
+<m:Documento>
 	a					rdfs:Class;
-	rdfs:label			"Documento de la coleccion Zaguan";
-	rdfs:range			skos:Concept .
+	rdfs:label			"Documento";
+	rdfs:comment		"Documento de la coleccion Zaguan" .
+	
+	
+<m:BachelorThesis>
+	a					rdfs:Class;
+	rdfs:label			"BachelorThesis";
+	rdfs:subClassOf		<m:Documento>;
+	rdfs:comment		"Bachelor Thesis" .
+	
+	
+<m:MasterThesis>
+	a					rdfs:Class;
+	rdfs:label			"MasterThesis";
+	rdfs:subClassOf		<m:Documento>;
+	rdfs:comment		"Master Thesis" .
+	
 
+<m:Persona>
+	a					rdfs:Class;
+	rdfs:label			"Persona";
+	rdfs:comment		"Persona" .
+	
 
-<Creador>
+<m:Organizacion>
+	a					rdfs:Class;
+	rdfs:label			"Organizacion";
+	rdfs:comment		"Organizacion" .
+	
+
+<m:nombre>
 	a					rdf:Property;
-	rdfs:subClassOf		<dc:creator>;
-	rdfs:label			"Autor del trabajo";
-	rdfs:domain  		<Documento> .
+	rdfs:label			"Nombre";
+	rdfs:domain  		<m:Persona>;
+	rdfs:domain			<m:Organizacion>;
+	rdfs:comment		"Nombre";
+	rdfs:range			<rdfs:Literal> .
 
-<Titulo>
+	
+<m:creador>
 	a					rdf:Property;
-	rdfs:subClassOf		<dc:title>;
-	rdfs:label			"Titulo del trabajo";
-    rdfs:domain  		<Documento> .
+	rdfs:label			"Autor";
+	rdfs:domain  		<m:Documento>;
+	rdfs:range			<m:Persona>;
+	rdfs:comment		"Creador del trabajo" .
 
-<Identificador>
+
+<m:titulo>
 	a					rdf:Property;
-	rdfs:subClassOf		<dc:identifier>;
-	rdfs:label			"Identificador del trabajo";
-	rdfs:domain  		<Documento> .
+	rdfs:label			"Titulo";
+    rdfs:domain  		<m:Documento>;
+	rdfs:range			<rdfs:Literal>;
+	rdfs:comment		"Titulo del trabajo" .
 
 
-<Tema>
+<m:identificador>
 	a					rdf:Property;
-	rdfs:subClassOf		<dc:subject>;
-	rdfs:label			"Tema del trabajo";
-	rdfs:domain  		<Documento> .
+	rdfs:label			"Identificador";
+	rdfs:domain  		<m:Documento>;
+	rdfs:range			<rdfs:Literal>;
+	rdfs:comment		"Identificador del trabajo" .
 
 
-<Publicador>
+<m:tema>
 	a					rdf:Property;
-	rdfs:subClassOf		<dc:publisher>;
-	rdfs:label			"Publicador del trabajo";
-    rdfs:domain  		<Documento> .
+	rdfs:label			"Tema";
+	rdfs:domain  		<m:Documento>;
+	rdfs:range			<skos:Concept>;
+	rdfs:comment		"Tema del trabajo" .
 
 
-<Descripcion>
+<m:publicador>
 	a					rdf:Property;
-	rdfs:subClassOf		<dc:description>;
-	rdfs:label			"Descripcion del trabajo";
-	rdfs:domain  		<Documento> .
+	rdfs:label			"Publicador";
+    rdfs:domain  		<m:Documento>;
+	rdfs:range  		<m:Organizacion>;
+	rdfs:comment		"Publicador del trabajo" .
 
 
-<Formato>
+<m:descripcion>
 	a					rdf:Property;
-	rdfs:subClassOf		<dc:format>;
-	rdfs:label			"Formato del trabajo";
-	rdfs:domain  		<Documento> .
+	rdfs:label			"Descripcion";
+	rdfs:domain  		<m:Documento>;
+	rdfs:range			<rdfs:Literal>;
+	rdfs:comment		"Descripcion del trabajo" .
 
 
-<Idioma>
+<m:formato>
 	a					rdf:Property;
-	rdfs:subClassOf		<dc:language>;
-	rdfs:label			"Idioma del trabajo";
-	rdfs:domain  		<Documento> .
+	rdfs:label			"Formato";
+	rdfs:domain  		<m:Documento>;
+	rdfs:range			<skos:Concept>;
+	rdfs:comment		"Formato del trabajo" .
 
 
-
-<Fecha>
+<m:idioma>
 	a					rdf:Property;
-	rdfs:subClassOf		<dc:date>;
-	rdfs:label			"Fecha del trabajo";
-	rdfs:domain  		<Documento> .
+	rdfs:label			"Idioma";
+	rdfs:domain  		<m:Documento>;
+	rdfs:range			<xsd:language>;
+	rdfs:comment		"Idioma del trabajo" .
 
 
-<Derechos>
+<m:fecha>
 	a					rdf:Property;
-	rdfs:subClassOf		<dc:rights>;
-	rdfs:label			"Derechos del trabajo";
-	rdfs:domain  		<Documento> .
+	rdfs:label			"Fecha";
+	rdfs:domain  		<m:Documento>;
+	rdfs:range			<xsd:gYear>;
+	rdfs:comment		"Fecha del trabajo" .
 
 
-<Tipo>
+<m:derechos>
 	a					rdf:Property;
-	rdfs:subClassOf		<dc:type>;
-	rdfs:label			"Tipo de trabajo";
-	rdfs:domain  		<Documento> .
+	rdfs:label			"Derechos";
+	rdfs:domain  		<m:Documento>;
+	rdfs:range			<skos:Concept>;
+	rdfs:comment		"Derechos del trabajo" .
+
 
 
