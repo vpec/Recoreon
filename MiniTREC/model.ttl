@@ -1,0 +1,87 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+<Documento>
+	a					rdfs:Class;
+	rdfs:label			"Documento de la coleccion Zaguan";
+	rdfs:range			skos:Concept .
+
+
+<Creador>
+	a					rdf:Property;
+	rdfs:subClassOf		<dc:creator>;
+	rdfs:label			"Autor del trabajo";
+	rdfs:domain  		<Documento> .
+
+<Titulo>
+	a					rdf:Property;
+	rdfs:subClassOf		<dc:title>;
+	rdfs:label			"Titulo del trabajo";
+    rdfs:domain  		<Documento> .
+
+<Identificador>
+	a					rdf:Property;
+	rdfs:subClassOf		<dc:identifier>;
+	rdfs:label			"Identificador del trabajo";
+	rdfs:domain  		<Documento> .
+
+
+<Tema>
+	a					rdf:Property;
+	rdfs:subClassOf		<dc:subject>;
+	rdfs:label			"Tema del trabajo";
+	rdfs:domain  		<Documento> .
+
+
+<Publicador>
+	a					rdf:Property;
+	rdfs:subClassOf		<dc:publisher>;
+	rdfs:label			"Publicador del trabajo";
+    rdfs:domain  		<Documento> .
+
+
+<Descripcion>
+	a					rdf:Property;
+	rdfs:subClassOf		<dc:description>;
+	rdfs:label			"Descripcion del trabajo";
+	rdfs:domain  		<Documento> .
+
+
+<Formato>
+	a					rdf:Property;
+	rdfs:subClassOf		<dc:format>;
+	rdfs:label			"Formato del trabajo";
+	rdfs:domain  		<Documento> .
+
+
+<Idioma>
+	a					rdf:Property;
+	rdfs:subClassOf		<dc:language>;
+	rdfs:label			"Idioma del trabajo";
+	rdfs:domain  		<Documento> .
+
+
+
+<Fecha>
+	a					rdf:Property;
+	rdfs:subClassOf		<dc:date>;
+	rdfs:label			"Fecha del trabajo";
+	rdfs:domain  		<Documento> .
+
+
+<Derechos>
+	a					rdf:Property;
+	rdfs:subClassOf		<dc:rights>;
+	rdfs:label			"Derechos del trabajo";
+	rdfs:domain  		<Documento> .
+
+
+<Tipo>
+	a					rdf:Property;
+	rdfs:subClassOf		<dc:type>;
+	rdfs:label			"Tipo de trabajo";
+	rdfs:domain  		<Documento> .
+
+
