@@ -29,6 +29,14 @@
 	a					rdfs:Class;
 	rdfs:label			"Persona";
 	rdfs:comment		"Persona" .
+
+
+<m:nombrePersona>
+	a					rdf:Property;
+	rdfs:label			"NombrePersona";
+	rdfs:domain  		<m:Persona>;
+	rdfs:comment		"Nombre de una persona";
+	rdfs:range			<rdfs:Literal> .
 	
 
 <m:Organizacion>
@@ -37,12 +45,11 @@
 	rdfs:comment		"Organizacion" .
 	
 
-<m:nombre>
+<m:nombreOrganizacion>
 	a					rdf:Property;
-	rdfs:label			"Nombre";
-	rdfs:domain  		<m:Persona>;
+	rdfs:label			"NombreOrganizacion";
 	rdfs:domain			<m:Organizacion>;
-	rdfs:comment		"Nombre";
+	rdfs:comment		"Nombre de una organizacion";
 	rdfs:range			<rdfs:Literal> .
 
 	

@@ -9,6 +9,5 @@
 	<classpathentry kind="lib" path="lib/lucene-analyzers-common-7.0.0.jar"/>
 	<classpathentry kind="lib" path="lib/lucene-core-7.0.0.jar"/>
 	<classpathentry kind="lib" path="lib/lucene-queryparser-7.0.0.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Gord/git/Recoreon/Practica1/lib/opennlp-tools-1.9.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
