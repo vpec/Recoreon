@@ -1,105 +1,104 @@
 @prefix skos: <http://www.w3.org/2004/02/skos/core#> .
 @prefix dc11: <http://purl.org/dc/elements/1.1/> .
-@prefix m: <http://github.com/vpec/Recoreon/> .
 
-<m:skos>
+<http://github.com/vpec/Recoreon/skos>
 	a skos:ConceptScheme ;
 	dc11:title "Modelo terminológico" ;
 	dc11:description "Modelo terminológico basado en SKOS." .
 
-<m:skos#licencia>
+<http://github.com/vpec/Recoreon/skos#licencia>
 	a skos:Concept ;
 	skos:definition "Licencia del documento" ;
 	skos:prefLabel "licencia"@es ;
 	skos:altLabel "rights"@en, "license"@en .
 
-<m:skos#pdf>
+<http://github.com/vpec/Recoreon/skos#pdf>
 	a skos:Concept ;
 	skos:definition "Formato PDF" ;
 	skos:prefLabel "pdf" ;
 	skos:altLabel "Portable Document Format"@en .
 
-<m:skos#medicina>
+<http://github.com/vpec/Recoreon/skos#medicina>
 	a skos:Concept ;
 	skos:definition "Conjunto de conocimientos y técnicas aplicados a la predicción, prevención, diagnóstico y tratamiento de las enfermedades humanas." ;
 	skos:prefLabel "medicina"@es ;
 	skos:altLabel "medicine"@en .
 
-<m:skos#enfermedad>
+<http://github.com/vpec/Recoreon/skos#enfermedad>
 	a skos:Concept ;
 	skos:definition "Alteración de la salud." ;
 	skos:prefLabel "enfermedad"@es ;
 	skos:altLabel "illness"@en, "mal"@es, "dolencia"@es, "padecimiento"@es, "afección"@es, "patología"@es .
 
-<m:skos#ocular>
+<http://github.com/vpec/Recoreon/skos#ocular>
 	a skos:Concept ;
 	skos:definition "Perteneciente o relativo a los ojos." ;
 	skos:prefLabel "ocular"@es ;
 	skos:altLabel "ocular"@en, "óptico"@es, "visual"@es .
 
-<m:skos#oftalmología>
+<http://github.com/vpec/Recoreon/skos#oftalmología>
 	a skos:Concept ;
 	skos:definition "Parte de la patología que trata de las enfermedades de los ojos." ;
 	skos:prefLabel "oftalmología"@es ;
 	skos:altLabel "ophthalmology"@en, "ofatlmológico"@es, "oftalmólogo"@es, "oftalmóloga"@es .
 
-<m:skos#cine>
+<http://github.com/vpec/Recoreon/skos#cine>
 	a skos:Concept ;
 	skos:definition "Técnica, arte e industria de la cinematografía." ;
 	skos:prefLabel "cine"@es ;
 	skos:altLabel "cinema"@en, "cinematografía"@es, "cinematográfico"@es .
 
-<m:skos#ideología>
+<http://github.com/vpec/Recoreon/skos#ideología>
 	a skos:Concept ;
 	skos:definition "Conjunto de ideas fundamentales que caracteriza el pensamiento de una persona." ;
 	skos:prefLabel "ideología"@es ;
 	skos:altLabel "ideology"@en, "ideológico"@es, "ideológica"@es .
 
-<m:skos#videojuego>
+<http://github.com/vpec/Recoreon/skos#videojuego>
 	a skos:Concept ;
 	skos:definition "Juego electrónico que se visualiza en una pantalla." ;
 	skos:prefLabel "videojuego"@es ;
 	skos:altLabel "videogame"@en, "juego"@es .
 
-<m:skos#inteligencia>
+<http://github.com/vpec/Recoreon/skos#inteligencia>
 	a skos:Concept ;
 	skos:definition "Disciplina científica que se ocupa de crear programas informáticos que ejecutan operaciones comparables a las que realiza la mente humana, como el aprendizaje o el razonamiento lógico." ;
 	skos:prefLabel "inteligencia"@es ;
 	skos:altLabel "intelligence"@en, "IA"@es, "AI"@en .
 
-<m:skos#personaje>
+<http://github.com/vpec/Recoreon/skos#personaje>
 	a skos:Concept ;
 	skos:definition "Cada uno de los seres reales o imaginarios que figuran en una obra literaria, teatral o cinematográfica." ;
 	skos:prefLabel "personaje"@es ;
 	skos:altLabel "character"@en .
 
-<m:skos#contaminación>
+<http://github.com/vpec/Recoreon/skos#contaminación>
 	a skos:Concept ;
 	skos:definition "Acción y efecto de contaminar." ;
 	skos:prefLabel "contaminación"@es ;
 	skos:altLabel "pollution"@en, "contaminar"@es, "contaminante"@es, "pollute"@en .
 
-<m:skos#España>
+<http://github.com/vpec/Recoreon/skos#España>
 	a skos:Concept ;
 	skos:definition "País de la Unión Europea." ;
 	skos:prefLabel "España"@es ;
 	skos:altLabel "Spain"@en, "español"@es, "spanish"@en .
 
-<m:skos#Aragón>
+<http://github.com/vpec/Recoreon/skos#Aragón>
 	a skos:Concept ;
 	skos:definition "Comunidad autónoma de España." ;
 	skos:prefLabel "Aragón"@es ;
 	skos:altLabel "Aragon"@en, "aragonés"@es, "aragonesa"@es ;
-	skos:broader <m:skos#España> .
+	skos:broader <http://github.com/vpec/Recoreon/skos#España> .
 
-<m:skos#Zaragoza>
+<http://github.com/vpec/Recoreon/skos#Zaragoza>
 	a skos:Concept ;
 	skos:definition "Provincia aragonesa." ;
 	skos:prefLabel "Zaragoza"@es ;
 	skos:altLabel "Saragossa"@en, "zaragozano"@es, "zaragozana"@es ;
-	skos:broader <m:skos#Aragón> .
+	skos:broader <http://github.com/vpec/Recoreon/skos#Aragón> .
 
-<m:skos#informática>
+<http://github.com/vpec/Recoreon/skos#informática>
 	a skos:Concept ;
 	skos:definition "Conjunto de conocimientos científicos y técnicas que hacen posible el tratamiento automático de la información por medio de computadoras." ;
 	skos:prefLabel "informática"@es ;
