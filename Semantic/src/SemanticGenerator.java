@@ -158,8 +158,10 @@ public class SemanticGenerator {
 	     	Property idioma = ResourceFactory.createProperty(prefix_m + "idioma");
 	     	Property fecha = ResourceFactory.createProperty(prefix_m + "fecha");
 	     	Property derechos = ResourceFactory.createProperty(prefix_m + "derechos");
-	     		     	
+	     	
+	     	String string;
 	     	for (String docPath : corpus.list()) {
+	     		string = docPath;
 	     		// Reading Flows
 		     	FileInputStream fis;
 		        try {
@@ -181,21 +183,25 @@ public class SemanticGenerator {
 						      
 			                  
 			                  nodes = document.getElementsByTagName("dc:title");
-						      // Add identifier property to the resource 						
-			                  docResource.addProperty(titulo, nodes.item(0).getTextContent());
-			                  addTopics(docResource, nodes.item(0).getTextContent(), tema);
+			                  if(nodes.getLength() > 0) {
+							      // Add identifier property to the resource 						
+				                  docResource.addProperty(titulo, nodes.item(0).getTextContent());
+				                  addTopics(docResource, nodes.item(0).getTextContent(), tema);
+			                  }
 			                  
 			                  
 			                  nodes = document.getElementsByTagName("dc:type");
-			                  // Eliminates info:eu-repo/semantics from the type of the document
-			                  String typeField = nodes.item(0).getTextContent().replace("info:eu-repo/semantics/", "");
-			                  if (typeField.equals("bachelorThesis")) {
-			                	// Bacherlor thesis document
-			                    docResource.addProperty(type, ResourceFactory.createResource(prefix_m + "BachelorThesis"));
-			                  }
-			                  else {
-			                    // Master thesis document
-			                     docResource.addProperty(type, ResourceFactory.createResource(prefix_m + "MasterThesis"));
+			                  if(nodes.getLength() > 0) {
+				                  // Eliminates info:eu-repo/semantics from the type of the document
+				                  String typeField = nodes.item(0).getTextContent().replace("info:eu-repo/semantics/", "");
+				                  if (typeField.equals("bachelorThesis")) {
+				                	// Bacherlor thesis document
+				                    docResource.addProperty(type, ResourceFactory.createResource(prefix_m + "BachelorThesis"));
+				                  }
+				                  else {
+				                    // Master thesis document
+				                     docResource.addProperty(type, ResourceFactory.createResource(prefix_m + "MasterThesis"));
+				                  }
 			                  }
 			                	 
 			                  nodes = document.getElementsByTagName("dc:creator"); 
@@ -207,49 +213,62 @@ public class SemanticGenerator {
 				                    	 	  .addProperty(nombrePersona, nodes.item(i).getTextContent()));
 					          }
 			                  
-			                  nodes = document.getElementsByTagName("dc:publisher"); 
-				              // Added the publisher of the document
+			                  nodes = document.getElementsByTagName("dc:publisher");
+			                  if(nodes.getLength() > 0) {
+			                	// Added the publisher of the document
 				                     docResource.addProperty(publicador, 
 				                    	 model.createResource()
-				                    	 	  .addProperty(type, ResourceFactory.createResource(prefix_m + "Organización"))
+				                    	 	  .addProperty(type, ResourceFactory.createResource(prefix_m + "OrganizaciÃ³n"))
 				                    	 	  .addProperty(nombreOrganizacion, nodes.item(0).getTextContent()));
+			                  }
+				              
 				                
 				             nodes = document.getElementsByTagName("dc:description");
-			                 docResource.addProperty(descripcion, nodes.item(0).getTextContent());
+				             if(nodes.getLength() > 0) {
+				            	 docResource.addProperty(descripcion, nodes.item(0).getTextContent());
+				             }
 
 				             nodes = document.getElementsByTagName("dc:format");
-				             // Added the format of the document
-				             docResource.addProperty(formato, ResourceFactory.createResource(prefix_m + "skos#pdf"));
+				             if(nodes.getLength() > 0) {
+					             // Added the format of the document
+					             docResource.addProperty(formato, ResourceFactory.createResource(prefix_m + "skos#pdf"));
+				             }
 				             
 				             nodes = document.getElementsByTagName("dc:rights");
-				             // Added the rights of the document
-			                 docResource.addProperty(derechos, ResourceFactory.createResource(prefix_m + "skos#licencia"));
-				             
+				             if(nodes.getLength() > 0) {
+					             // Added the rights of the document
+				                 docResource.addProperty(derechos, ResourceFactory.createResource(prefix_m + "skos#licencia"));
+				             }
+			                 
 				             nodes = document.getElementsByTagName("dc:date");
-				             String dateField = nodes.item(0).getTextContent();
-		                	 // Verification of whether the date is expressed as a range with the W3CDTF format
-		                	 if (dateField.contains("T")) {
-		                		 // Extraction of the dates of the range
-		                		 dateField = dateField.substring(0, dateField.indexOf("T"));
-		                		 dateField = dateField.substring(0, dateField.indexOf("-"));
-		                		 dateField = dateField.replace("-", "");
-		                	 }
-		                	 // Added the date of the document
-		                	 Literal dateLiteral = model.createTypedLiteral(dateField, XSDDatatype.XSDgYear);
-		                 	 docResource.addProperty(fecha, dateLiteral);
+				             if(nodes.getLength() > 0) {
+					             String dateField = nodes.item(0).getTextContent();
+			                	 // Verification of whether the date is expressed as a range with the W3CDTF format
+			                	 if (dateField.contains("T")) {
+			                		 // Extraction of the dates of the range
+			                		 dateField = dateField.substring(0, dateField.indexOf("T"));
+			                		 dateField = dateField.substring(0, dateField.indexOf("-"));
+			                		 dateField = dateField.replace("-", "");
+			                	 }
+			                	 // Added the date of the document
+			                	 Literal dateLiteral = model.createTypedLiteral(dateField, XSDDatatype.XSDgYear);
+			                 	 docResource.addProperty(fecha, dateLiteral);
+				             }
 		                 	 
 				             nodes = document.getElementsByTagName("dc:language");
-				             Literal languageLiteral;
-		                	 if (nodes.item(0).getTextContent().equals("spa")) {
-		                		 // Documents in spanish language
-		                    	 languageLiteral = model.createTypedLiteral("es", XSDDatatype.XSDlanguage);
-		                	 }
-		                	 else {
-		                		 // Documents in english language
-		                    	 languageLiteral = model.createTypedLiteral("en", XSDDatatype.XSDlanguage);
-		                	 }
-		                	 // Added language of the document
-		                	 docResource.addProperty(idioma, languageLiteral);
+				             if(nodes.getLength() > 0) {
+					             Literal languageLiteral;
+			                	 if (nodes.item(0).getTextContent().equals("spa")) {
+			                		 // Documents in spanish language
+			                    	 languageLiteral = model.createTypedLiteral("es", XSDDatatype.XSDlanguage);
+			                	 }
+			                	 else {
+			                		 // Documents in english language
+			                    	 languageLiteral = model.createTypedLiteral("en", XSDDatatype.XSDlanguage);
+			                	 }
+			                	 // Added language of the document
+			                	 docResource.addProperty(idioma, languageLiteral);
+				             }
 		                	 
 				             nodes = document.getElementsByTagName("dc:subject");
 		                	 for (int i = 0; i < nodes.getLength(); i++) {
@@ -267,9 +286,7 @@ public class SemanticGenerator {
 				        }
 		        } 
 		        catch (FileNotFoundException fnfe) {
-	                    System.out.println(docPath);
 		        		fnfe.printStackTrace();
-		        		System.exit(1);
 		        }
 			}
 	     	
