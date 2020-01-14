@@ -14,6 +14,7 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.util.ResourceUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -36,14 +37,14 @@ public class SemanticGenerator {
 			 // Look the word in the hash table
 			 if (concepts.containsKey(word)) {
 				 // Store the topic of the document
-				 docResource.addProperty(tema, concepts.get(word));
+				 docResource.addProperty(tema, ResourceFactory.createResource(concepts.get(word)));
 			 }
 		 }
 	}
 	
 	
 	
-	public static void readSkos(String skosPath) {
+	public static void readSkos(String skosPath, String prefix_skos) {
 		// Open the file of the skos concepts
 		FileInputStream fis;
 		try {
@@ -65,8 +66,8 @@ public class SemanticGenerator {
 		         
 		         for (int i = 0; i < nodes.getLength(); i++) {
 		        	Element element = (Element)nodes.item(i);
-		        	String uri = element.getTextContent();
-		        	
+		        	String uri = prefix_skos + element.getElementsByTagName("skos:prefLabel").
+		        			 item(0).getTextContent();
 		        	concepts.put(element.getElementsByTagName("skos:prefLabel").
 		        			 item(0).getTextContent(), uri);
 		
@@ -126,35 +127,37 @@ public class SemanticGenerator {
 				}
 			}
 			
-			// Fill the hash table of skos concepts
-			readSkos(skosPath);
-			
-			// Creation of an empty model
-			Model model = ModelFactory.createDefaultModel();
-			
-			// Directory where the documents of the corpus are allocated
-			File corpus = new File(docsPath);
-			
 			// Creation of the properties of the model
+			String prefix_skos = "http://github.com/vpec/Recoreon/skos#";
 	        String prefix_rdf = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
 	        String prefix_rdfs = "http://www.w3.org/2000/01/rdf-schema#";
 	        String prefix_m = "http://github.com/vpec/Recoreon/";
 	        String prefix_xsd = "http://www.w3.org/2001/XMLSchema#";
-	
-	     	Property type = model.createProperty(prefix_rdf + "type");
-	
-	     	Property nombrePersona = model.createProperty((prefix_m + "nombrePersona"));
-	     	Property nombreOrganizacion = model.createProperty((prefix_m + "nombreOrganizacion"));
-	     	Property creador = model.createProperty(prefix_m + "creador");
-	     	Property titulo = model.createProperty(prefix_m + "titulo");
-	     	Property identificador = model.createProperty(prefix_m + "identificador");
-	     	Property tema = model.createProperty(prefix_m + "tema");
-	     	Property publicador = model.createProperty(prefix_m + "publicador");
-	     	Property descripcion = model.createProperty(prefix_m + "descripcion");
-	     	Property formato = model.createProperty(prefix_m + "formato");
-	     	Property idioma = model.createProperty(prefix_m + "idioma");
-	     	Property fecha = model.createProperty(prefix_m + "fecha");
-	     	Property derechos = model.createProperty(prefix_m + "derechos");
+			
+			// Fill the hash table of skos concepts
+			readSkos(skosPath, prefix_skos);
+			
+			// Creation of an empty model
+			Model model = ModelFactory.createDefaultModel();
+			model.setNsPrefix("m", prefix_m);
+			
+			// Directory where the documents of the corpus are allocated
+			File corpus = new File(docsPath);
+			
+			
+	     	Property type = ResourceFactory.createProperty(prefix_rdf + "type");
+	     	Property nombrePersona = ResourceFactory.createProperty(prefix_m + "nombrePersona");
+	     	Property nombreOrganizacion = ResourceFactory.createProperty(prefix_m + "nombreOrganizacion");
+	     	Property creador = ResourceFactory.createProperty(prefix_m + "creador");
+	     	Property titulo = ResourceFactory.createProperty(prefix_m + "titulo");
+	     	Property identificador = ResourceFactory.createProperty(prefix_m + "identificador");
+	     	Property tema = ResourceFactory.createProperty(prefix_m + "tema");
+	     	Property publicador = ResourceFactory.createProperty(prefix_m + "publicador");
+	     	Property descripcion = ResourceFactory.createProperty(prefix_m + "descripcion");
+	     	Property formato = ResourceFactory.createProperty(prefix_m + "formato");
+	     	Property idioma = ResourceFactory.createProperty(prefix_m + "idioma");
+	     	Property fecha = ResourceFactory.createProperty(prefix_m + "fecha");
+	     	Property derechos = ResourceFactory.createProperty(prefix_m + "derechos");
 	     		     	
 	     	for (String docPath : corpus.list()) {
 	     		// Reading Flows
@@ -168,96 +171,94 @@ public class SemanticGenerator {
 				          try {
 				              DocumentBuilder builder = factory.newDocumentBuilder();
 				              org.w3c.dom.Document document = builder.parse(fis);
-				              Element element = document.getDocumentElement();
-				              NodeList nodes = element.getChildNodes();
-				              String id;
-				              // Creation of the resource
-				              Resource docResource  = model.createResource();
-				              for (int i = 0; i < nodes.getLength(); i++) {
-				                 id = nodes.item(i).getNodeName();
-				                 if(id.contentEquals("dc:title")) {
-				                	 // Add title property to the resource 
-				                	 docResource.addProperty(titulo, nodes.item(i).getTextContent());
-				                	 // Added topics
-				                	 addTopics(docResource, nodes.item(i).getTextContent(), tema);
-				                 } 
-				                 else if(id.contentEquals("dc:identifier")) {
-				                	 // Add identifier property to the resource 
-				                	 docResource.addProperty(identificador, nodes.item(i).getTextContent());
-				                	 // Set resource URI
-				                	 ResourceUtils.renameResource(docResource, nodes.item(i).getTextContent());
-				                 } 
-				                 else if(id.contentEquals("dc:type")) {
-				                	 // Eliminates info:eu-repo/semantics from the type of the document
-				                	 String typeField = nodes.item(i).getTextContent().replace("info:eu-repo/semantics/", "");
-				                	 if (typeField.equals("bachelorThesis")) {
-				                		 // Bacherlor thesis document
-				                    	 docResource.addProperty(type, prefix_m + "BachelorThesis");
-				                	 }
-				                	 else {
-				                		 // Master thesis document
-				                		 docResource.addProperty(type, prefix_m + "MasterThesis");
-				                	 }
-				                 }
-				                 else if(id.contentEquals("dc:creator")) {                
-				                	 // Added the author of the document
+						      document.getDocumentElement().normalize();
+						      
+						      NodeList nodes = document.getElementsByTagName("dc:identifier");
+						      // Creation of the resource
+				              Resource docResource  = model.createResource(nodes.item(0).getTextContent());
+						      // Add identifier property to the resource 						
+			                  docResource.addProperty(identificador, nodes.item(0).getTextContent());
+						      
+			                  
+			                  nodes = document.getElementsByTagName("dc:title");
+						      // Add identifier property to the resource 						
+			                  docResource.addProperty(titulo, nodes.item(0).getTextContent());
+			                  addTopics(docResource, nodes.item(0).getTextContent(), tema);
+			                  
+			                  
+			                  nodes = document.getElementsByTagName("dc:type");
+			                  // Eliminates info:eu-repo/semantics from the type of the document
+			                  String typeField = nodes.item(0).getTextContent().replace("info:eu-repo/semantics/", "");
+			                  if (typeField.equals("bachelorThesis")) {
+			                	// Bacherlor thesis document
+			                    docResource.addProperty(type, ResourceFactory.createResource(prefix_m + "BachelorThesis"));
+			                  }
+			                  else {
+			                    // Master thesis document
+			                     docResource.addProperty(type, ResourceFactory.createResource(prefix_m + "MasterThesis"));
+			                  }
+			                	 
+			                  nodes = document.getElementsByTagName("dc:creator"); 
+			                  for (int i = 0; i < nodes.getLength(); i++) {
+			                	// Added the author of the document
 				                     docResource.addProperty(creador, 
 				                    	 model.createResource()
+				                    	 	  .addProperty(type, ResourceFactory.createResource(prefix_m + "Persona"))
 				                    	 	  .addProperty(nombrePersona, nodes.item(i).getTextContent()));
-				                 }
-				                 else if (id.contentEquals("dc:publisher")) {
-				                	// Added the publisher of the document
+					          }
+			                  
+			                  nodes = document.getElementsByTagName("dc:publisher"); 
+				              // Added the publisher of the document
 				                     docResource.addProperty(publicador, 
 				                    	 model.createResource()
-				                    	 	  .addProperty(nombreOrganizacion, nodes.item(i).getTextContent()));
-				                 }
-				                 else if (id.contentEquals("dc:description")) {
-				                 	// Added the description of the document
-				                    docResource.addProperty(descripcion, nodes.item(i).getTextContent());
-				                 }
-				                 else if (id.contentEquals("dc:format")) {
-				                 	// Added the format of the document
-				                    docResource.addProperty(formato, prefix_m + "skos#pdf");
-				                 }
-				                 else if (id.contentEquals("dc:rights")) {
-				                	// Added the rights of the document
-				                	docResource.addProperty(derechos, prefix_m + "skos#licencia");
-				                 }
-				                 else if (id.contentEquals("dc:date")) {
-				                	 // Extract the date stored in the textfield
-				                	 String dateField = nodes.item(i).getTextContent();
-				                	 // Verification of whether the date is expressed as a range with the W3CDTF format
-				                	 if (dateField.contains("T")) {
-				                		 // Extraction of the dates of the range
-				                		 dateField = dateField.substring(0, dateField.indexOf("T"));
-				                		 dateField = dateField.substring(0, dateField.indexOf("-"));
-				                		 dateField = dateField.replace("-", "");
-				                	 }
-				                	 // Added the date of the document
-				                	 Literal dateLiteral = model.createTypedLiteral(dateField, XSDDatatype.XSDgYear);
-				                 	 docResource.addProperty(fecha, dateLiteral);
-				                 }
-				                 else if (id.contentEquals("dc:language")) {
-				                	 Literal languageLiteral;
-				                	 if (nodes.item(i).getTextContent().equals("spa")) {
-				                		 // Documents in spanish language
-				                    	 languageLiteral = model.createTypedLiteral("es", XSDDatatype.XSDlanguage);
-				                	 }
-				                	 else {
-				                		 // Documents in english language
-				                    	 languageLiteral = model.createTypedLiteral("en", XSDDatatype.XSDlanguage);
-				                	 }
-				                	 // Added language of the document
-				                	 docResource.addProperty(idioma, languageLiteral);
-				                 }
-				                 else if (id.contentEquals("dc:subject")) {
-				                	 // Added topics of the document
-				                	 addTopics(docResource, nodes.item(i).getTextContent(), tema);
-				                 }
-				              }
+				                    	 	  .addProperty(type, ResourceFactory.createResource(prefix_m + "Organización"))
+				                    	 	  .addProperty(nombreOrganizacion, nodes.item(0).getTextContent()));
+				                
+				             nodes = document.getElementsByTagName("dc:description");
+			                 docResource.addProperty(descripcion, nodes.item(0).getTextContent());
+
+				             nodes = document.getElementsByTagName("dc:format");
+				             // Added the format of the document
+				             docResource.addProperty(formato, ResourceFactory.createResource(prefix_m + "skos#pdf"));
+				             
+				             nodes = document.getElementsByTagName("dc:rights");
+				             // Added the rights of the document
+			                 docResource.addProperty(derechos, ResourceFactory.createResource(prefix_m + "skos#licencia"));
+				             
+				             nodes = document.getElementsByTagName("dc:date");
+				             String dateField = nodes.item(0).getTextContent();
+		                	 // Verification of whether the date is expressed as a range with the W3CDTF format
+		                	 if (dateField.contains("T")) {
+		                		 // Extraction of the dates of the range
+		                		 dateField = dateField.substring(0, dateField.indexOf("T"));
+		                		 dateField = dateField.substring(0, dateField.indexOf("-"));
+		                		 dateField = dateField.replace("-", "");
+		                	 }
+		                	 // Added the date of the document
+		                	 Literal dateLiteral = model.createTypedLiteral(dateField, XSDDatatype.XSDgYear);
+		                 	 docResource.addProperty(fecha, dateLiteral);
+		                 	 
+				             nodes = document.getElementsByTagName("dc:language");
+				             Literal languageLiteral;
+		                	 if (nodes.item(0).getTextContent().equals("spa")) {
+		                		 // Documents in spanish language
+		                    	 languageLiteral = model.createTypedLiteral("es", XSDDatatype.XSDlanguage);
+		                	 }
+		                	 else {
+		                		 // Documents in english language
+		                    	 languageLiteral = model.createTypedLiteral("en", XSDDatatype.XSDlanguage);
+		                	 }
+		                	 // Added language of the document
+		                	 docResource.addProperty(idioma, languageLiteral);
+		                	 
+				             nodes = document.getElementsByTagName("dc:subject");
+		                	 for (int i = 0; i < nodes.getLength(); i++) {
+		                		// Added topics of the document
+			                	 addTopics(docResource, nodes.item(i).getTextContent(), tema);
+						     }
 				          }
 				          catch(Exception e) {
-				        	  System.out.println(e.toString());
+				        	  e.printStackTrace();
 				          }
 				        } 
 				        finally {
@@ -266,7 +267,9 @@ public class SemanticGenerator {
 				        }
 		        } 
 		        catch (FileNotFoundException fnfe) {
+	                    System.out.println(docPath);
 		        		fnfe.printStackTrace();
+		        		System.exit(1);
 		        }
 			}
 	     	
