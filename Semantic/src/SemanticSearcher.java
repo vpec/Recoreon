@@ -58,7 +58,6 @@ public class SemanticSearcher {
 			String query;  
 			while((query = br.readLine()) != null){
 				infoNeeds.put(query.substring(0, query.indexOf(" ")), query.substring(query.indexOf(" ") + 1, query.length()));
-				
 			}
 			br.close();
 		}
