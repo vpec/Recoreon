@@ -226,6 +226,7 @@ public class SemanticGenerator {
 				             nodes = document.getElementsByTagName("dc:description");
 				             if(nodes.getLength() > 0) {
 				            	 docResource.addProperty(descripcion, nodes.item(0).getTextContent());
+				            	 addTopics(docResource, nodes.item(0).getTextContent(), tema);
 				             }
 
 				             nodes = document.getElementsByTagName("dc:format");
@@ -284,7 +285,7 @@ public class SemanticGenerator {
 				          // Close the reading flows
 				          fis.close();
 				        }
-		        } 
+		        }
 		        catch (FileNotFoundException fnfe) {
 		        		fnfe.printStackTrace();
 		        }
@@ -293,6 +294,6 @@ public class SemanticGenerator {
 	     	//lo guardamos en un fichero rdf en formato xml
 			model.write(new FileOutputStream(new File(rdfPath)), "RDF/XML-ABBREV");
 			
-			System.out.println("FIN DEL PROGRAMA");
+			System.out.println("END OF PROGRAM");
 		}
 }
