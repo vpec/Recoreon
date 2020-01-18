@@ -3,12 +3,20 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Hashtable;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.apache.lucene.analysis.StopwordAnalyzerBase;
+import org.apache.commons.io.FileUtils;
 import org.apache.jena.datatypes.xsd.XSDDatatype;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.ReadWrite;
+import org.apache.jena.query.text.EntityDefinition;
+import org.apache.jena.query.text.TextDatasetFactory;
+import org.apache.jena.query.text.TextIndexConfig;
 import org.apache.jena.rdf.model.InfModel;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
@@ -16,10 +24,39 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.tdb2.TDB2Factory;
 import org.apache.jena.util.FileManager;
 import org.apache.jena.util.ResourceUtils;
+import org.apache.jena.vocabulary.DCTerms;
+import org.apache.lucene.analysis.en.EnglishAnalyzer;
+import org.apache.lucene.analysis.es.SpanishAnalyzer;
+import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.MMapDirectory;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+import java.io.File;
+import java.nio.file.Paths;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ReadWrite;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.text.EntityDefinition;
+import org.apache.jena.query.text.TextDatasetFactory;
+import org.apache.jena.query.text.TextIndexConfig;
+import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.tdb2.TDB2Factory;
+import org.apache.jena.vocabulary.DCTerms;
+import org.apache.lucene.analysis.en.EnglishAnalyzer;
+import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.MMapDirectory;
 
 import openllet.jena.PelletReasonerFactory;
 
@@ -304,6 +341,29 @@ public class SemanticGenerator {
 	     	
 	     	//lo guardamos en un fichero rdf en formato xml
 			model.write(new FileOutputStream(new File(rdfPath)), "RDF/XML-ABBREV");
+			
+			
+			
+			
+			EntityDefinition entDef = new EntityDefinition("uri", "titulo", titulo);
+//			entDef.set("descripcion", titulo.asNode());
+			TextIndexConfig config = new TextIndexConfig(entDef);
+		    config.setAnalyzer(new SpanishAnalyzer());
+		    config.setQueryAnalyzer(new SpanishAnalyzer());
+//		    config.setMultilingualSupport(true);
+		    
+		    //definimos el repositorio indexado todo en disco
+		    //se borra el repositorio para forzar a que cada vez que lo ejecutamos se cree de cero
+		    FileUtils.deleteDirectory(new File("repositorio"));
+		    Dataset ds1 = TDB2Factory.connectDataset("repositorio/tdb2");
+		    Directory dir =  new MMapDirectory(Paths.get("./repositorio/lucene"));
+		    Dataset ds = TextDatasetFactory.createLucene(ds1, dir, config) ;
+			
+		    // cargamos el fichero deseado y lo almacenamos en el repositorio indexado	
+		    ds.begin(ReadWrite.WRITE) ;
+	        RDFDataMgr.read(ds.getDefaultModel(), rdfPath) ;
+	        ds.commit(); 
+	        ds.end();
 			
 			System.out.println("END OF PROGRAM");
 		}
