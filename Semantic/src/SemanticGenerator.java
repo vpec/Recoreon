@@ -9,15 +9,19 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.jena.datatypes.xsd.XSDDatatype;
+import org.apache.jena.rdf.model.InfModel;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.util.FileManager;
 import org.apache.jena.util.ResourceUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
+import openllet.jena.PelletReasonerFactory;
 
 
 public class SemanticGenerator {
@@ -134,16 +138,18 @@ public class SemanticGenerator {
 	        String prefix_m = "http://github.com/vpec/Recoreon/";
 	        String prefix_xsd = "http://www.w3.org/2001/XMLSchema#";
 			
+	        // Access owl model
+	        Model model = FileManager.get().loadModel(owlPath, "TURTLE");
+	        
 			// Fill the hash table of skos concepts
 			readSkos(skosPath, prefix_skos);
-			
-			// Creation of an empty model
-			Model model = ModelFactory.createDefaultModel();
-			model.setNsPrefix("m", prefix_m);
 			
 			// Directory where the documents of the corpus are allocated
 			File corpus = new File(docsPath);
 			
+			
+			
+			model.setNsPrefix("m", prefix_m);
 			
 	     	Property type = ResourceFactory.createProperty(prefix_rdf + "type");
 	     	Property nombrePersona = ResourceFactory.createProperty(prefix_m + "nombrePersona");
@@ -195,7 +201,7 @@ public class SemanticGenerator {
 				                  // Eliminates info:eu-repo/semantics from the type of the document
 				                  String typeField = nodes.item(0).getTextContent().replace("info:eu-repo/semantics/", "");
 				                  if (typeField.equals("bachelorThesis")) {
-				                	// Bacherlor thesis document
+				                	// Bachelor thesis document
 				                    docResource.addProperty(type, ResourceFactory.createResource(prefix_m + "BachelorThesis"));
 				                  }
 				                  else {
@@ -290,6 +296,11 @@ public class SemanticGenerator {
 		        		fnfe.printStackTrace();
 		        }
 			}
+			
+	     	//creamos un modelo de inferencia OWL2
+			// InfModel inf = ModelFactory.createInfModel(PelletReasonerFactory.theInstance().create(), model);
+	     	InfModel inf = ModelFactory.createRDFSModel(model);
+	     	model.add(inf);
 	     	
 	     	//lo guardamos en un fichero rdf en formato xml
 			model.write(new FileOutputStream(new File(rdfPath)), "RDF/XML-ABBREV");

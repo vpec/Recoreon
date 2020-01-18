@@ -77,6 +77,7 @@ public class SemanticSearcher {
 			e.printStackTrace();
 		}
 		
+		
 		// Load model
 		Model model = FileManager.get().loadModel(rdfPath);
 		
@@ -85,6 +86,8 @@ public class SemanticSearcher {
 			PrintWriter printWriter = new PrintWriter(fileWriter);		    
 			
 			for(Entry<String, String> entry : infoNeeds.entrySet()) {
+				System.out.println(entry.getKey());
+				System.out.println(entry.getValue());
 				Query query = QueryFactory.create(entry.getValue());
 				QueryExecution qexec = QueryExecutionFactory.create(query, model);
 				try {
