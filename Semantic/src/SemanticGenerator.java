@@ -176,7 +176,7 @@ public class SemanticGenerator {
 	        String prefix_xsd = "http://www.w3.org/2001/XMLSchema#";
 			
 	        // Access owl model
-	        Model model = FileManager.get().loadModel(owlPath, "TURTLE");
+	        Model model = FileManager.get().loadModel(owlPath);
 	        
 			// Fill the hash table of skos concepts
 			readSkos(skosPath, prefix_skos);
@@ -335,7 +335,7 @@ public class SemanticGenerator {
 			}
 			
 	     	//creamos un modelo de inferencia OWL2
-			// InfModel inf = ModelFactory.createInfModel(PelletReasonerFactory.theInstance().create(), model);
+//			InfModel inf = ModelFactory.createInfModel(PelletReasonerFactory.theInstance().create(), model);
 	     	InfModel inf = ModelFactory.createRDFSModel(model);
 	     	model.add(inf);
 	     	
@@ -345,25 +345,25 @@ public class SemanticGenerator {
 			
 			
 			
-			EntityDefinition entDef = new EntityDefinition("uri", "titulo", titulo);
-//			entDef.set("descripcion", titulo.asNode());
-			TextIndexConfig config = new TextIndexConfig(entDef);
-		    config.setAnalyzer(new SpanishAnalyzer());
-		    config.setQueryAnalyzer(new SpanishAnalyzer());
-//		    config.setMultilingualSupport(true);
-		    
-		    //definimos el repositorio indexado todo en disco
-		    //se borra el repositorio para forzar a que cada vez que lo ejecutamos se cree de cero
-		    FileUtils.deleteDirectory(new File("repositorio"));
-		    Dataset ds1 = TDB2Factory.connectDataset("repositorio/tdb2");
-		    Directory dir =  new MMapDirectory(Paths.get("./repositorio/lucene"));
-		    Dataset ds = TextDatasetFactory.createLucene(ds1, dir, config) ;
-			
-		    // cargamos el fichero deseado y lo almacenamos en el repositorio indexado	
-		    ds.begin(ReadWrite.WRITE) ;
-	        RDFDataMgr.read(ds.getDefaultModel(), rdfPath) ;
-	        ds.commit(); 
-	        ds.end();
+//			EntityDefinition entDef = new EntityDefinition("uri", "titulo", titulo);
+////			entDef.set("descripcion", titulo.asNode());
+//			TextIndexConfig config = new TextIndexConfig(entDef);
+//		    config.setAnalyzer(new SpanishAnalyzer());
+//		    config.setQueryAnalyzer(new SpanishAnalyzer());
+////		    config.setMultilingualSupport(true);
+//		    
+//		    //definimos el repositorio indexado todo en disco
+//		    //se borra el repositorio para forzar a que cada vez que lo ejecutamos se cree de cero
+//		    FileUtils.deleteDirectory(new File("repositorio"));
+//		    Dataset ds1 = TDB2Factory.connectDataset("repositorio/tdb2");
+//		    Directory dir =  new MMapDirectory(Paths.get("./repositorio/lucene"));
+//		    Dataset ds = TextDatasetFactory.createLucene(ds1, dir, config) ;
+//			
+//		    // cargamos el fichero deseado y lo almacenamos en el repositorio indexado	
+//		    ds.begin(ReadWrite.WRITE) ;
+//	        RDFDataMgr.read(ds.getDefaultModel(), rdfPath) ;
+//	        ds.commit(); 
+//	        ds.end();
 			
 			System.out.println("END OF PROGRAM");
 		}
