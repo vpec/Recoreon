@@ -191,19 +191,19 @@ public class SemanticGenerator {
 			
 			model.setNsPrefix("m", prefix_m);
 			
-	     	Property type = ResourceFactory.createProperty(prefix_rdf + "type");
-	     	Property nombrePersona = ResourceFactory.createProperty(prefix_m + "nombrePersona");
-	     	Property nombreOrganizacion = ResourceFactory.createProperty(prefix_m + "nombreOrganizacion");
-	     	Property creador = ResourceFactory.createProperty(prefix_m + "creador");
-	     	Property titulo = ResourceFactory.createProperty(prefix_m + "titulo");
-	     	Property identificador = ResourceFactory.createProperty(prefix_m + "identificador");
-	     	Property tema = ResourceFactory.createProperty(prefix_m + "tema");
-	     	Property publicador = ResourceFactory.createProperty(prefix_m + "publicador");
-	     	Property descripcion = ResourceFactory.createProperty(prefix_m + "descripcion");
-	     	Property formato = ResourceFactory.createProperty(prefix_m + "formato");
-	     	Property idioma = ResourceFactory.createProperty(prefix_m + "idioma");
-	     	Property fecha = ResourceFactory.createProperty(prefix_m + "fecha");
-	     	Property derechos = ResourceFactory.createProperty(prefix_m + "derechos");
+	     	Property type = ResourceFactory.createProperty(prefix_rdf, "type");
+	     	Property nombrePersona = ResourceFactory.createProperty(prefix_m, "nombrePersona");
+	     	Property nombreOrganizacion = ResourceFactory.createProperty(prefix_m, "nombreOrganizacion");
+	     	Property creador = ResourceFactory.createProperty(prefix_m, "creador");
+	     	Property titulo = ResourceFactory.createProperty(prefix_m, "titulo");
+	     	Property identificador = ResourceFactory.createProperty(prefix_m, "identificador");
+	     	Property tema = ResourceFactory.createProperty(prefix_m, "tema");
+	     	Property publicador = ResourceFactory.createProperty(prefix_m, "publicador");
+	     	Property descripcion = ResourceFactory.createProperty(prefix_m, "descripcion");
+	     	Property formato = ResourceFactory.createProperty(prefix_m, "formato");
+	     	Property idioma = ResourceFactory.createProperty(prefix_m, "idioma");
+	     	Property fecha = ResourceFactory.createProperty(prefix_m, "fecha");
+	     	Property derechos = ResourceFactory.createProperty(prefix_m, "derechos");
 	     	
 	     	String string;
 	     	for (String docPath : corpus.list()) {
@@ -350,7 +350,7 @@ public class SemanticGenerator {
 			
 			
 //			EntityDefinition entDef = new EntityDefinition("uri", "titulo", titulo);
-////			entDef.set("descripcion", titulo.asNode());
+//			entDef.set("descripcion", titulo.asNode());
 //			TextIndexConfig config = new TextIndexConfig(entDef);
 //		    config.setAnalyzer(new SpanishAnalyzer());
 //		    config.setQueryAnalyzer(new SpanishAnalyzer());
@@ -361,7 +361,7 @@ public class SemanticGenerator {
 //		    FileUtils.deleteDirectory(new File("repositorio"));
 //		    Dataset ds1 = TDB2Factory.connectDataset("repositorio/tdb2");
 //		    Directory dir =  new MMapDirectory(Paths.get("./repositorio/lucene"));
-//		    Dataset ds = TextDatasetFactory.createLucene(ds1, dir, config) ;
+//		    Dataset ds = TextDatasetFactory.createLucene(ds1, dir, config);
 //			
 //		    // cargamos el fichero deseado y lo almacenamos en el repositorio indexado	
 //		    ds.begin(ReadWrite.WRITE) ;

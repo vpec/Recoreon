@@ -40,7 +40,7 @@
 	a skos:Concept ;
 	skos:definition "Parte de la patología que trata de las enfermedades de los ojos." ;
 	skos:prefLabel "oftalmología"@es ;
-	skos:altLabel "ophthalmology"@en, "ofatlmológico"@es, "oftalmólogo"@es, "oftalmóloga"@es .
+	skos:altLabel "ophthalmology"@en, "oftalmológico"@es, "oftalmólogo"@es, "oftalmóloga"@es .
 
 <http://github.com/vpec/Recoreon/skos#cine>
 	a skos:Concept ;
