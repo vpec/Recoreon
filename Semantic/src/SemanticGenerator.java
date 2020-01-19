@@ -178,6 +178,9 @@ public class SemanticGenerator {
 	        // Access owl model
 	        Model model = FileManager.get().loadModel(owlPath);
 	        
+	        Model modelSkos = FileManager.get().loadModel(skosPath);
+	        model.add(modelSkos);
+	        
 			// Fill the hash table of skos concepts
 			readSkos(skosPath, prefix_skos);
 			
@@ -340,7 +343,8 @@ public class SemanticGenerator {
 	     	model.add(inf);
 	     	
 	     	//lo guardamos en un fichero rdf en formato xml
-			model.write(new FileOutputStream(new File(rdfPath)), "RDF/XML-ABBREV");
+//			model.write(new FileOutputStream(new File(rdfPath)), "RDF/XML-ABBREV");
+			model.write(new FileOutputStream(new File(rdfPath)));
 			
 			
 			

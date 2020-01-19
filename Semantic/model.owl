@@ -251,6 +251,7 @@
     <!-- http://github.com/vpec/Recoreon/Documento -->
 
     <owl:Class rdf:about="http://github.com/vpec/Recoreon/Documento">
+        <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="http://github.com/vpec/Recoreon/creador"/>
@@ -282,6 +283,7 @@
     <!-- http://github.com/vpec/Recoreon/Organizacion -->
 
     <owl:Class rdf:about="http://github.com/vpec/Recoreon/Organizacion">
+        <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
         <rdfs:comment>Organizacion</rdfs:comment>
         <rdfs:label>Organizacion</rdfs:label>
     </owl:Class>
@@ -291,6 +293,7 @@
     <!-- http://github.com/vpec/Recoreon/Persona -->
 
     <owl:Class rdf:about="http://github.com/vpec/Recoreon/Persona">
+        <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
         <rdfs:comment>Persona</rdfs:comment>
         <rdfs:label>Persona</rdfs:label>
     </owl:Class>
