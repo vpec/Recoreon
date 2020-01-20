@@ -338,8 +338,8 @@ public class SemanticGenerator {
 			}
 			
 	     	//creamos un modelo de inferencia OWL2
-//			InfModel inf = ModelFactory.createInfModel(PelletReasonerFactory.theInstance().create(), model);
-	     	InfModel inf = ModelFactory.createRDFSModel(model);
+			InfModel inf = ModelFactory.createInfModel(PelletReasonerFactory.theInstance().create(), model);
+//	     	InfModel inf = ModelFactory.createRDFSModel(model);
 	     	model.add(inf);
 	     	
 	     	//lo guardamos en un fichero rdf en formato xml
@@ -350,7 +350,7 @@ public class SemanticGenerator {
 			
 			
 //			EntityDefinition entDef = new EntityDefinition("uri", "titulo", titulo);
-//			entDef.set("descripcion", titulo.asNode());
+////			entDef.set("descripcion", descripcion.asNode());
 //			TextIndexConfig config = new TextIndexConfig(entDef);
 //		    config.setAnalyzer(new SpanishAnalyzer());
 //		    config.setQueryAnalyzer(new SpanishAnalyzer());
