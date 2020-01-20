@@ -29,6 +29,7 @@ import org.apache.jena.tdb2.TDB2Factory;
 import org.apache.jena.util.FileManager;
 import org.apache.jena.util.ResourceUtils;
 import org.apache.jena.vocabulary.DCTerms;
+import org.apache.jena.vocabulary.RDF;
 import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.apache.lucene.analysis.es.SpanishAnalyzer;
 import org.apache.lucene.store.Directory;
@@ -205,6 +206,7 @@ public class SemanticGenerator {
 	     	Property fecha = ResourceFactory.createProperty(prefix_m, "fecha");
 	     	Property derechos = ResourceFactory.createProperty(prefix_m, "derechos");
 	     	
+	     	
 	     	String string;
 	     	for (String docPath : corpus.list()) {
 	     		string = docPath;
@@ -242,11 +244,11 @@ public class SemanticGenerator {
 				                  String typeField = nodes.item(0).getTextContent().replace("info:eu-repo/semantics/", "");
 				                  if (typeField.equals("bachelorThesis")) {
 				                	// Bachelor thesis document
-				                    docResource.addProperty(type, ResourceFactory.createResource(prefix_m + "BachelorThesis"));
+				                    docResource.addProperty(RDF.type, ResourceFactory.createResource(prefix_m + "BachelorThesis"));
 				                  }
 				                  else {
 				                    // Master thesis document
-				                     docResource.addProperty(type, ResourceFactory.createResource(prefix_m + "MasterThesis"));
+				                     docResource.addProperty(RDF.type, ResourceFactory.createResource(prefix_m + "MasterThesis"));
 				                  }
 			                  }
 			                	 
@@ -255,7 +257,7 @@ public class SemanticGenerator {
 			                	// Added the author of the document
 				                     docResource.addProperty(creador, 
 				                    	 model.createResource()
-				                    	 	  .addProperty(type, ResourceFactory.createResource(prefix_m + "Persona"))
+				                    	 	  .addProperty(RDF.type, ResourceFactory.createResource(prefix_m + "Persona"))
 				                    	 	  .addProperty(nombrePersona, nodes.item(i).getTextContent()));
 					          }
 			                  
@@ -264,7 +266,7 @@ public class SemanticGenerator {
 			                	// Added the publisher of the document
 				                     docResource.addProperty(publicador, 
 				                    	 model.createResource()
-				                    	 	  .addProperty(type, ResourceFactory.createResource(prefix_m + "Organización"))
+				                    	 	  .addProperty(RDF.type, ResourceFactory.createResource(prefix_m + "Organización"))
 				                    	 	  .addProperty(nombreOrganizacion, nodes.item(0).getTextContent()));
 			                  }
 				              
@@ -289,7 +291,7 @@ public class SemanticGenerator {
 			                 
 				             nodes = document.getElementsByTagName("dc:date");
 				             if(nodes.getLength() > 0) {
-					             String dateField = nodes.item(0).getTextContent();
+					             String dateField = nodes.item(0).getTextContent().trim();
 			                	 // Verification of whether the date is expressed as a range with the W3CDTF format
 			                	 if (dateField.contains("T")) {
 			                		 // Extraction of the dates of the range
@@ -345,29 +347,6 @@ public class SemanticGenerator {
 	     	//lo guardamos en un fichero rdf en formato xml
 //			model.write(new FileOutputStream(new File(rdfPath)), "RDF/XML-ABBREV");
 			model.write(new FileOutputStream(new File(rdfPath)));
-			
-			
-			
-			
-//			EntityDefinition entDef = new EntityDefinition("uri", "titulo", titulo);
-////			entDef.set("descripcion", descripcion.asNode());
-//			TextIndexConfig config = new TextIndexConfig(entDef);
-//		    config.setAnalyzer(new SpanishAnalyzer());
-//		    config.setQueryAnalyzer(new SpanishAnalyzer());
-////		    config.setMultilingualSupport(true);
-//		    
-//		    //definimos el repositorio indexado todo en disco
-//		    //se borra el repositorio para forzar a que cada vez que lo ejecutamos se cree de cero
-//		    FileUtils.deleteDirectory(new File("repositorio"));
-//		    Dataset ds1 = TDB2Factory.connectDataset("repositorio/tdb2");
-//		    Directory dir =  new MMapDirectory(Paths.get("./repositorio/lucene"));
-//		    Dataset ds = TextDatasetFactory.createLucene(ds1, dir, config);
-//			
-//		    // cargamos el fichero deseado y lo almacenamos en el repositorio indexado	
-//		    ds.begin(ReadWrite.WRITE) ;
-//	        RDFDataMgr.read(ds.getDefaultModel(), rdfPath) ;
-//	        ds.commit(); 
-//	        ds.end();
 			
 			System.out.println("END OF PROGRAM");
 		}

@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.Paths;
 import java.util.Hashtable;
 import java.util.Map.Entry;
 
@@ -12,16 +13,31 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.text.EntityDefinition;
+import org.apache.jena.query.text.TextDatasetFactory;
+import org.apache.jena.query.text.TextIndexConfig;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.tdb2.TDB2Factory;
 import org.apache.jena.util.FileManager;
+import org.apache.jena.vocabulary.DCTerms;
+import org.apache.lucene.analysis.en.EnglishAnalyzer;
+import org.apache.lucene.analysis.es.SpanishAnalyzer;
+import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.MMapDirectory;
+import org.apache.lucene.store.RAMDirectory;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -79,7 +95,22 @@ public class SemanticSearcher {
 		
 		
 		// Load model
-		Model model = FileManager.get().loadModel(rdfPath);
+		Property titulo = ResourceFactory.createProperty("http://github.com/vpec/Recoreon/", "titulo");
+		
+		//definimos la configuración del repositorio indexado
+		EntityDefinition entDef = new EntityDefinition("uri", "titulo", titulo);
+		entDef.set("titulo", titulo.asNode());
+		TextIndexConfig config = new TextIndexConfig(entDef);
+	    config.setAnalyzer(new SpanishAnalyzer());
+	    config.setQueryAnalyzer(new SpanishAnalyzer());
+	    
+	    //definimos el repositorio indexado todo en memoria
+	    Dataset ds1 = DatasetFactory.createGeneral() ;
+	    Directory dir =  new RAMDirectory();
+	    Dataset ds = TextDatasetFactory.createLucene(ds1, dir, config) ;
+		
+	    // cargamos el fichero deseado y lo almacenamos en el repositorio indexado	  
+        RDFDataMgr.read(ds.getDefaultModel(), rdfPath) ;
 		
 		try {
 			FileWriter fileWriter = new FileWriter(resultsPath);
@@ -89,7 +120,7 @@ public class SemanticSearcher {
 				System.out.println(entry.getKey());
 				System.out.println(entry.getValue());
 				Query query = QueryFactory.create(entry.getValue());
-				QueryExecution qexec = QueryExecutionFactory.create(query, model);
+				QueryExecution qexec = QueryExecutionFactory.create(query, ds);
 				try {
 				    ResultSet results = qexec.execSelect() ;
 				    for ( ; results.hasNext() ; ){
