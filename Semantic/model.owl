@@ -9,22 +9,23 @@
     <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
   </rdf:Description>
 
-  <owl:Class rdf:about="http://github.com/vpec/Recoreon/BachelorThesis">
+  <rdf:Description rdf:about="http://github.com/vpec/Recoreon/BachelorThesis">
     <rdfs:label>BachelorThesis</rdfs:label>
     <rdfs:subClassOf rdf:resource="http://github.com/vpec/Recoreon/Documento"/>
     <rdfs:comment>Bachelor Thesis</rdfs:comment>
-  </owl:Class>
+  </rdf:Description>
 
-  <owl:Class rdf:about="http://github.com/vpec/Recoreon/MasterThesis">
+  <rdf:Description rdf:about="http://github.com/vpec/Recoreon/MasterThesis">
     <rdfs:label>MasterThesis</rdfs:label>
     <rdfs:subClassOf rdf:resource="http://github.com/vpec/Recoreon/Documento"/>
     <rdfs:comment>Master Thesis</rdfs:comment>
-  </owl:Class>
+  </rdf:Description>
 
-  <owl:Class rdf:about="http://github.com/vpec/Recoreon/Persona">
+  <rdf:Description rdf:about="http://github.com/vpec/Recoreon/Persona">
     <rdfs:label>Persona</rdfs:label>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
     <rdfs:comment>Persona</rdfs:comment>
-  </owl:Class>
+  </rdf:Description>
 
   <owl:DatatypeProperty rdf:about="http://github.com/vpec/Recoreon/nombrePersona">
     <rdfs:label>NombrePersona</rdfs:label>
@@ -33,10 +34,11 @@
     <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
   </owl:DatatypeProperty>
 
-  <owl:Class rdf:about="http://github.com/vpec/Recoreon/Organizacion">
+  <rdf:Description rdf:about="http://github.com/vpec/Recoreon/Organizacion">
     <rdfs:label>Organizacion</rdfs:label>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
     <rdfs:comment>Organizacion</rdfs:comment>
-  </owl:Class>
+  </rdf:Description>
 
   <owl:DatatypeProperty rdf:about="http://github.com/vpec/Recoreon/nombreOrganizacion">
     <rdfs:label>NombreOrganizacion</rdfs:label>

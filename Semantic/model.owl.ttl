@@ -13,22 +13,20 @@ m:Documento
 	
 	
 m:BachelorThesis
-	a					owl:Class;
 	rdfs:label			"BachelorThesis";
 	rdfs:subClassOf		m:Documento;
 	rdfs:comment		"Bachelor Thesis" .
 	
 	
 m:MasterThesis
-	a					owl:Class;
 	rdfs:label			"MasterThesis";
 	rdfs:subClassOf		m:Documento;
 	rdfs:comment		"Master Thesis" .
 	
 
 m:Persona
-	a					owl:Class;
 	rdfs:label			"Persona";
+	rdfs:subClassOf		owl:Thing;
 	rdfs:comment		"Persona" .
 
 
@@ -41,8 +39,8 @@ m:nombrePersona
 	
 
 m:Organizacion
-	a					owl:Class;
 	rdfs:label			"Organizacion";
+	rdfs:subClassOf		owl:Thing;
 	rdfs:comment		"Organizacion" .
 	
 
