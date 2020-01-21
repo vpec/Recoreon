@@ -1,44 +1,92 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk-13.0.1">
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/java-11-openjdk-amd64">
 		<attributes>
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/Users/Gord/git/Recoreon/Semantic/lib/collection-0.7.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Gord/git/Recoreon/Semantic/lib/commons-cli-1.4.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Gord/git/Recoreon/Semantic/lib/commons-codec-1.13.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Gord/git/Recoreon/Semantic/lib/commons-compress-1.19.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Gord/git/Recoreon/Semantic/lib/commons-csv-1.7.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Gord/git/Recoreon/Semantic/lib/commons-io-2.6.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Gord/git/Recoreon/Semantic/lib/commons-lang3-3.9.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Gord/git/Recoreon/Semantic/lib/httpclient-4.5.10.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Gord/git/Recoreon/Semantic/lib/httpclient-cache-4.5.10.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Gord/git/Recoreon/Semantic/lib/httpcore-4.4.12.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Gord/git/Recoreon/Semantic/lib/jackson-annotations-2.9.10.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Gord/git/Recoreon/Semantic/lib/jackson-core-2.9.10.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Gord/git/Recoreon/Semantic/lib/jackson-databind-2.9.10.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Gord/git/Recoreon/Semantic/lib/jcl-over-slf4j-1.7.26.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Gord/git/Recoreon/Semantic/lib/jena-arq-3.13.1.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Gord/git/Recoreon/Semantic/lib/jena-base-3.13.1.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Gord/git/Recoreon/Semantic/lib/jena-cmds-3.13.1.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Gord/git/Recoreon/Semantic/lib/jena-core-3.13.1.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Gord/git/Recoreon/Semantic/lib/jena-dboe-base-3.13.1.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Gord/git/Recoreon/Semantic/lib/jena-dboe-index-3.13.1.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Gord/git/Recoreon/Semantic/lib/jena-dboe-storage-3.13.1.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Gord/git/Recoreon/Semantic/lib/jena-dboe-transaction-3.13.1.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Gord/git/Recoreon/Semantic/lib/jena-dboe-trans-data-3.13.1.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Gord/git/Recoreon/Semantic/lib/jena-iri-3.13.1.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Gord/git/Recoreon/Semantic/lib/jena-rdfconnection-3.13.1.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Gord/git/Recoreon/Semantic/lib/jena-shacl-3.13.1.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Gord/git/Recoreon/Semantic/lib/jena-shaded-guava-3.13.1.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Gord/git/Recoreon/Semantic/lib/jena-tdb2-3.13.1.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Gord/git/Recoreon/Semantic/lib/jena-tdb-3.13.1.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Gord/git/Recoreon/Semantic/lib/jsonld-java-0.12.5.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Gord/git/Recoreon/Semantic/lib/libthrift-0.12.0.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Gord/git/Recoreon/Semantic/lib/log4j-1.2.17.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Gord/git/Recoreon/Semantic/lib/slf4j-api-1.7.26.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Gord/git/Recoreon/Semantic/lib/slf4j-log4j12-1.7.26.jar"/>
+	<classpathentry kind="lib" path="/home/victor/Recoreon/Semantic/lib/collection-0.7.jar"/>
+	<classpathentry kind="lib" path="/home/victor/Recoreon/Semantic/lib/commons-cli-1.4.jar"/>
+	<classpathentry kind="lib" path="/home/victor/Recoreon/Semantic/lib/commons-codec-1.13.jar"/>
+	<classpathentry kind="lib" path="/home/victor/Recoreon/Semantic/lib/commons-compress-1.19.jar"/>
+	<classpathentry kind="lib" path="/home/victor/Recoreon/Semantic/lib/commons-csv-1.7.jar"/>
+	<classpathentry kind="lib" path="/home/victor/Recoreon/Semantic/lib/commons-io-2.6.jar"/>
+	<classpathentry kind="lib" path="/home/victor/Recoreon/Semantic/lib/commons-lang3-3.9.jar"/>
+	<classpathentry kind="lib" path="/home/victor/Recoreon/Semantic/lib/httpclient-4.5.10.jar"/>
+	<classpathentry kind="lib" path="/home/victor/Recoreon/Semantic/lib/httpclient-cache-4.5.10.jar"/>
+	<classpathentry kind="lib" path="/home/victor/Recoreon/Semantic/lib/httpcore-4.4.12.jar"/>
+	<classpathentry kind="lib" path="/home/victor/Recoreon/Semantic/lib/jackson-annotations-2.9.10.jar"/>
+	<classpathentry kind="lib" path="/home/victor/Recoreon/Semantic/lib/jackson-core-2.9.10.jar"/>
+	<classpathentry kind="lib" path="/home/victor/Recoreon/Semantic/lib/jackson-databind-2.9.10.jar"/>
+	<classpathentry kind="lib" path="/home/victor/Recoreon/Semantic/lib/jcl-over-slf4j-1.7.26.jar"/>
+	<classpathentry kind="lib" path="/home/victor/Recoreon/Semantic/lib/jena-arq-3.13.1.jar"/>
+	<classpathentry kind="lib" path="/home/victor/Recoreon/Semantic/lib/jena-base-3.13.1.jar"/>
+	<classpathentry kind="lib" path="/home/victor/Recoreon/Semantic/lib/jena-cmds-3.13.1.jar"/>
+	<classpathentry kind="lib" path="/home/victor/Recoreon/Semantic/lib/jena-core-3.13.1.jar"/>
+	<classpathentry kind="lib" path="/home/victor/Recoreon/Semantic/lib/jena-dboe-base-3.13.1.jar"/>
+	<classpathentry kind="lib" path="/home/victor/Recoreon/Semantic/lib/jena-dboe-index-3.13.1.jar"/>
+	<classpathentry kind="lib" path="/home/victor/Recoreon/Semantic/lib/jena-dboe-storage-3.13.1.jar"/>
+	<classpathentry kind="lib" path="/home/victor/Recoreon/Semantic/lib/jena-dboe-transaction-3.13.1.jar"/>
+	<classpathentry kind="lib" path="/home/victor/Recoreon/Semantic/lib/jena-dboe-trans-data-3.13.1.jar"/>
+	<classpathentry kind="lib" path="/home/victor/Recoreon/Semantic/lib/jena-iri-3.13.1.jar"/>
+	<classpathentry kind="lib" path="/home/victor/Recoreon/Semantic/lib/jena-rdfconnection-3.13.1.jar"/>
+	<classpathentry kind="lib" path="/home/victor/Recoreon/Semantic/lib/jena-shacl-3.13.1.jar"/>
+	<classpathentry kind="lib" path="/home/victor/Recoreon/Semantic/lib/jena-shaded-guava-3.13.1.jar"/>
+	<classpathentry kind="lib" path="/home/victor/Recoreon/Semantic/lib/jena-tdb2-3.13.1.jar"/>
+	<classpathentry kind="lib" path="/home/victor/Recoreon/Semantic/lib/jena-tdb-3.13.1.jar"/>
+	<classpathentry kind="lib" path="/home/victor/Recoreon/Semantic/lib/jsonld-java-0.12.5.jar"/>
+	<classpathentry kind="lib" path="/home/victor/Recoreon/Semantic/lib/libthrift-0.12.0.jar"/>
+	<classpathentry kind="lib" path="/home/victor/Recoreon/Semantic/lib/log4j-1.2.17.jar"/>
+	<classpathentry kind="lib" path="/home/victor/Recoreon/Semantic/lib/slf4j-api-1.7.26.jar"/>
+	<classpathentry kind="lib" path="/home/victor/Recoreon/Semantic/lib/slf4j-log4j12-1.7.26.jar"/>
+	<classpathentry kind="lib" path="/home/victor/.m2/repository/com/github/galigator/openllet/openllet-jena/2.6.3/openllet-jena-2.6.3.jar" sourcepath="/home/victor/.m2/repository/com/github/galigator/openllet/openllet-jena/2.6.3/openllet-jena-2.6.3-sources.jar">
+		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.groupId" value="com.github.galigator.openllet"/>
+			<attribute name="maven.artifactId" value="openllet-jena"/>
+			<attribute name="maven.version" value="2.6.3"/>
+			<attribute name="maven.scope" value="compile"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/victor/.m2/repository/com/github/galigator/openllet/openllet-core/2.6.3/openllet-core-2.6.3.jar"/>
+	<classpathentry kind="lib" path="/home/victor/.m2/repository/com/github/galigator/openllet/openllet-functions/2.6.3/openllet-functions-2.6.3.jar"/>
+	<classpathentry kind="lib" path="/home/victor/.m2/repository/org/apache/jena/jena-text/3.5.0/jena-text-3.5.0.jar" sourcepath="/home/victor/.m2/repository/org/apache/jena/jena-text/3.5.0/jena-text-3.5.0-sources.jar">
+		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.groupId" value="org.apache.jena"/>
+			<attribute name="maven.artifactId" value="jena-text"/>
+			<attribute name="maven.version" value="3.5.0"/>
+			<attribute name="maven.scope" value="compile"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/victor/.m2/repository/org/apache/lucene/lucene-analyzers-common/6.4.1/lucene-analyzers-common-6.4.1.jar" sourcepath="/home/victor/.m2/repository/org/apache/lucene/lucene-analyzers-common/6.4.1/lucene-analyzers-common-6.4.1-sources.jar">
+		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.groupId" value="org.apache.lucene"/>
+			<attribute name="maven.artifactId" value="lucene-analyzers-common"/>
+			<attribute name="maven.version" value="6.4.1"/>
+			<attribute name="maven.scope" value="compile"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/victor/.m2/repository/org/apache/lucene/lucene-core/6.4.1/lucene-core-6.4.1.jar" sourcepath="/home/victor/.m2/repository/org/apache/lucene/lucene-core/6.4.1/lucene-core-6.4.1-sources.jar">
+		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.groupId" value="org.apache.lucene"/>
+			<attribute name="maven.artifactId" value="lucene-core"/>
+			<attribute name="maven.version" value="6.4.1"/>
+			<attribute name="maven.scope" value="compile"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/victor/.m2/repository/org/apache/lucene/lucene-queries/6.4.1/lucene-queries-6.4.1.jar"/>
+	<classpathentry kind="lib" path="/home/victor/.m2/repository/org/apache/lucene/lucene-queryparser/6.4.1/lucene-queryparser-6.4.1.jar"/>
+	<classpathentry kind="lib" path="/home/victor/.m2/repository/org/apache/lucene/lucene-sandbox/6.4.1/lucene-sandbox-6.4.1.jar"/>
+	<classpathentry kind="lib" path="/home/victor/.m2/repository/org/apache/jena/jena-dboe-index/3.5.0/jena-dboe-index-3.5.0.jar"/>
+	<classpathentry kind="lib" path="/home/victor/.m2/repository/org/jgrapht/jgrapht-core/1.0.1/jgrapht-core-1.0.1.jar"/>
+	<classpathentry kind="lib" path="/home/victor/.m2/repository/org/jgrapht/jgrapht-ext/1.0.1/jgrapht-ext-1.0.1.jar"/>
+	<classpathentry kind="lib" path="/home/victor/.m2/repository/org/apache/jena/jena-arq/3.4.0/jena-arq-3.4.0.jar"/>
+	<classpathentry kind="lib" path="/home/victor/.m2/repository/org/apache/jena/jena-base/3.4.0/jena-base-3.4.0.jar"/>
+	<classpathentry kind="lib" path="/home/victor/.m2/repository/org/apache/jena/jena-rdfconnection/3.5.0/jena-rdfconnection-3.5.0.jar"/>
+	<classpathentry kind="lib" path="/home/victor/.m2/repository/org/apache/jena/jena-cmds/3.5.0/jena-cmds-3.5.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
