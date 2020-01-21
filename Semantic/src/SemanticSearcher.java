@@ -51,7 +51,7 @@ public class SemanticSearcher {
 	private static Hashtable<String, String> infoNeeds = new Hashtable<>();
 
 	public static void main(String[] args) {
-		// Path of the parameters of the programm semantic searcher
+		// Path of the parameters of the program semantic searcher
 		String rdfPath = null,  infoNeedsPath = null, resultsPath = null;
 	
 		

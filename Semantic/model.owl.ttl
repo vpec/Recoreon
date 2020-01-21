@@ -83,6 +83,7 @@ m:tema
 	rdfs:label			"Tema";
 	rdfs:domain  		m:Documento;
 	rdfs:range			skos:Concept;
+	owl:propertyChainAxiom (m:tema skos:broader);
 	rdfs:comment		"Tema del trabajo" .
 
 
@@ -132,6 +133,4 @@ m:derechos
 	rdfs:domain  		m:Documento;
 	rdfs:range			skos:Concept;
 	rdfs:comment		"Derechos del trabajo" .
-
-
 
