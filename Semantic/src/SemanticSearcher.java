@@ -99,13 +99,14 @@ public class SemanticSearcher {
 		
 		// Load model
 		Property titulo = ResourceFactory.createProperty("http://github.com/vpec/Recoreon/", "titulo");
+		Property descripcion = ResourceFactory.createProperty("http://github.com/vpec/Recoreon/", "descripcion");
 		
 		//definimos la configuración del repositorio indexado
 		EntityDefinition entDef = new EntityDefinition("uri", "titulo", titulo);
-		entDef.set("titulo", titulo.asNode());
+		entDef.set("descripcion", descripcion.asNode());
 		TextIndexConfig config = new TextIndexConfig(entDef);
-	    config.setAnalyzer(new SpanishAnalyzer());
-	    config.setQueryAnalyzer(new SpanishAnalyzer());
+//	    config.setAnalyzer(new SpanishAnalyzer());
+//	    config.setQueryAnalyzer(new SpanishAnalyzer());
 	    
 	    //definimos el repositorio indexado todo en memoria
 	    Dataset ds1 = DatasetFactory.createGeneral() ;
@@ -120,17 +121,17 @@ public class SemanticSearcher {
 			PrintWriter printWriter = new PrintWriter(fileWriter);		    
 			
 			for(Entry<String, String> entry : infoNeeds.entrySet()) {
-				System.out.println(entry.getKey());
-				System.out.println(entry.getValue());
 				Query query = QueryFactory.create(entry.getValue());
 				QueryExecution qexec = QueryExecutionFactory.create(query, ds);
 				try {
 				    ResultSet results = qexec.execSelect() ;
 				    for ( ; results.hasNext() ; ){
 				      QuerySolution soln = results.nextSolution() ;
-				      String uriDoc = soln.getResource("uriDoc").getURI();
-				      String[] parts = uriDoc.split("/");
-				      printWriter.println(entry.getKey() + " " + startingString + parts[parts.length - 1] + endingString);
+				      if(soln.getResource("uriDoc") != null) {
+				    	  String uriDoc = soln.getResource("uriDoc").getURI();
+					      String[] parts = uriDoc.split("/");
+					      printWriter.println(entry.getKey() + " " + startingString + parts[parts.length - 1] + endingString);
+				      }
 				    }
 				}
 				finally { 
