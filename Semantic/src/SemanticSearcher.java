@@ -93,6 +93,9 @@ public class SemanticSearcher {
 			e.printStackTrace();
 		}
 		
+		String startingString = "oai_zaguan.unizar.es_";
+		String endingString = ".xml";
+		
 		
 		// Load model
 		Property titulo = ResourceFactory.createProperty("http://github.com/vpec/Recoreon/", "titulo");
@@ -125,8 +128,9 @@ public class SemanticSearcher {
 				    ResultSet results = qexec.execSelect() ;
 				    for ( ; results.hasNext() ; ){
 				      QuerySolution soln = results.nextSolution() ;
-				      Resource uriDoc = soln.getResource("uriDoc");
-				      printWriter.println(entry.getKey() + " " + uriDoc.getURI());
+				      String uriDoc = soln.getResource("uriDoc").getURI();
+				      String[] parts = uriDoc.split("/");
+				      printWriter.println(entry.getKey() + " " + startingString + parts[parts.length - 1] + endingString);
 				    }
 				}
 				finally { 
