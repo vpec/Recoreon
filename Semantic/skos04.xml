@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+         xmlns:dc11="http://purl.org/dc/elements/1.1/">
+
+  <skos:ConceptScheme rdf:about="http://github.com/vpec/Recoreon/skos">
+    <dc11:title>Modelo terminológico</dc11:title>
+    <dc11:description>Modelo terminológico basado en SKOS.</dc11:description>
+  </skos:ConceptScheme>
+
+  <skos:Concept rdf:about="http://github.com/vpec/Recoreon/skos#licencia">
+    <skos:definition>Licencia del documento</skos:definition>
+    <skos:prefLabel xml:lang="es">licencia</skos:prefLabel>
+    <skos:altLabel xml:lang="en">rights</skos:altLabel>
+    <skos:altLabel xml:lang="en">license</skos:altLabel>
+  </skos:Concept>
+
+  <skos:Concept rdf:about="http://github.com/vpec/Recoreon/skos#pdf">
+    <skos:definition>Formato PDF</skos:definition>
+    <skos:prefLabel>pdf</skos:prefLabel>
+    <skos:altLabel xml:lang="en">Portable Document Format</skos:altLabel>
+  </skos:Concept>
+
+  <skos:Concept rdf:about="http://github.com/vpec/Recoreon/skos#medicina">
+    <skos:definition>Conjunto de conocimientos y técnicas aplicados a la predicción, prevención, diagnóstico y tratamiento de las enfermedades humanas.</skos:definition>
+    <skos:prefLabel xml:lang="es">medicina</skos:prefLabel>
+    <skos:altLabel xml:lang="en">medicine</skos:altLabel>
+  </skos:Concept>
+
+  <skos:Concept rdf:about="http://github.com/vpec/Recoreon/skos#enfermedad">
+    <skos:definition>Alteración de la salud.</skos:definition>
+    <skos:prefLabel xml:lang="es">enfermedad</skos:prefLabel>
+    <skos:altLabel xml:lang="en">illness</skos:altLabel>
+    <skos:altLabel xml:lang="es">mal</skos:altLabel>
+    <skos:altLabel xml:lang="es">dolencia</skos:altLabel>
+    <skos:altLabel xml:lang="es">padecimiento</skos:altLabel>
+    <skos:altLabel xml:lang="es">afección</skos:altLabel>
+    <skos:altLabel xml:lang="es">patología</skos:altLabel>
+  </skos:Concept>
+
+  <skos:Concept rdf:about="http://github.com/vpec/Recoreon/skos#ocular">
+    <skos:definition>Perteneciente o relativo a los ojos.</skos:definition>
+    <skos:prefLabel xml:lang="es">ocular</skos:prefLabel>
+    <skos:altLabel xml:lang="en">ocular</skos:altLabel>
+    <skos:altLabel xml:lang="es">óptico</skos:altLabel>
+    <skos:altLabel xml:lang="es">visual</skos:altLabel>
+  </skos:Concept>
+
+  <skos:Concept rdf:about="http://github.com/vpec/Recoreon/skos#oftalmología">
+    <skos:definition>Parte de la patología que trata de las enfermedades de los ojos.</skos:definition>
+    <skos:prefLabel xml:lang="es">oftalmología</skos:prefLabel>
+    <skos:altLabel xml:lang="en">ophthalmology</skos:altLabel>
+    <skos:altLabel xml:lang="es">ofatlmológico</skos:altLabel>
+    <skos:altLabel xml:lang="es">oftalmólogo</skos:altLabel>
+    <skos:altLabel xml:lang="es">oftalmóloga</skos:altLabel>
+  </skos:Concept>
+
+  <skos:Concept rdf:about="http://github.com/vpec/Recoreon/skos#cine">
+    <skos:definition>Técnica, arte e industria de la cinematografía.</skos:definition>
+    <skos:prefLabel xml:lang="es">cine</skos:prefLabel>
+    <skos:altLabel xml:lang="en">cinema</skos:altLabel>
+    <skos:altLabel xml:lang="es">cinematografía</skos:altLabel>
+    <skos:altLabel xml:lang="es">cinematográfico</skos:altLabel>
+  </skos:Concept>
+
+  <skos:Concept rdf:about="http://github.com/vpec/Recoreon/skos#ideología">
+    <skos:definition>Conjunto de ideas fundamentales que caracteriza el pensamiento de una persona.</skos:definition>
+    <skos:prefLabel xml:lang="es">ideología</skos:prefLabel>
+    <skos:altLabel xml:lang="en">ideology</skos:altLabel>
+    <skos:altLabel xml:lang="es">ideológico</skos:altLabel>
+    <skos:altLabel xml:lang="es">ideológica</skos:altLabel>
+  </skos:Concept>
+
+  <skos:Concept rdf:about="http://github.com/vpec/Recoreon/skos#videojuego">
+    <skos:definition>Juego electrónico que se visualiza en una pantalla.</skos:definition>
+    <skos:prefLabel xml:lang="es">videojuego</skos:prefLabel>
+    <skos:altLabel xml:lang="en">videogame</skos:altLabel>
+    <skos:altLabel xml:lang="es">juego</skos:altLabel>
+  </skos:Concept>
+
+  <skos:Concept rdf:about="http://github.com/vpec/Recoreon/skos#inteligencia">
+    <skos:definition>Disciplina científica que se ocupa de crear programas informáticos que ejecutan operaciones comparables a las que realiza la mente humana, como el aprendizaje o el razonamiento lógico.</skos:definition>
+    <skos:prefLabel xml:lang="es">inteligencia</skos:prefLabel>
+    <skos:altLabel xml:lang="en">intelligence</skos:altLabel>
+    <skos:altLabel xml:lang="es">IA</skos:altLabel>
+    <skos:altLabel xml:lang="en">AI</skos:altLabel>
+  </skos:Concept>
+
+  <skos:Concept rdf:about="http://github.com/vpec/Recoreon/skos#personaje">
+    <skos:definition>Cada uno de los seres reales o imaginarios que figuran en una obra literaria, teatral o cinematográfica.</skos:definition>
+    <skos:prefLabel xml:lang="es">personaje</skos:prefLabel>
+    <skos:altLabel xml:lang="en">character</skos:altLabel>
+  </skos:Concept>
+
+  <skos:Concept rdf:about="http://github.com/vpec/Recoreon/skos#contaminación">
+    <skos:definition>Acción y efecto de contaminar.</skos:definition>
+    <skos:prefLabel xml:lang="es">contaminación</skos:prefLabel>
+    <skos:altLabel xml:lang="en">pollution</skos:altLabel>
+    <skos:altLabel xml:lang="es">contaminar</skos:altLabel>
+    <skos:altLabel xml:lang="es">contaminante</skos:altLabel>
+    <skos:altLabel xml:lang="en">pollute</skos:altLabel>
+  </skos:Concept>
+
+  <skos:Concept rdf:about="http://github.com/vpec/Recoreon/skos#España">
+    <skos:definition>País de la Unión Europea.</skos:definition>
+    <skos:prefLabel xml:lang="es">España</skos:prefLabel>
+    <skos:altLabel xml:lang="en">Spain</skos:altLabel>
+    <skos:altLabel xml:lang="es">español</skos:altLabel>
+    <skos:altLabel xml:lang="en">spanish</skos:altLabel>
+  </skos:Concept>
+
+  <skos:Concept rdf:about="http://github.com/vpec/Recoreon/skos#Aragón">
+    <skos:definition>Comunidad autónoma de España.</skos:definition>
+    <skos:prefLabel xml:lang="es">Aragón</skos:prefLabel>
+    <skos:altLabel xml:lang="en">Aragon</skos:altLabel>
+    <skos:altLabel xml:lang="es">aragonés</skos:altLabel>
+    <skos:altLabel xml:lang="es">aragonesa</skos:altLabel>
+    <skos:broader rdf:resource="http://github.com/vpec/Recoreon/skos#España"/>
+  </skos:Concept>
+
+  <skos:Concept rdf:about="http://github.com/vpec/Recoreon/skos#Zaragoza">
+    <skos:definition>Provincia aragonesa.</skos:definition>
+    <skos:prefLabel xml:lang="es">Zaragoza</skos:prefLabel>
+    <skos:altLabel xml:lang="en">Saragossa</skos:altLabel>
+    <skos:altLabel xml:lang="es">zaragozano</skos:altLabel>
+    <skos:altLabel xml:lang="es">zaragozana</skos:altLabel>
+    <skos:broader rdf:resource="http://github.com/vpec/Recoreon/skos#Aragón"/>
+  </skos:Concept>
+
+  <skos:Concept rdf:about="http://github.com/vpec/Recoreon/skos#informática">
+    <skos:definition>Conjunto de conocimientos científicos y técnicas que hacen posible el tratamiento automático de la información por medio de computadoras.</skos:definition>
+    <skos:prefLabel xml:lang="es">informática</skos:prefLabel>
+    <skos:altLabel xml:lang="en">computer</skos:altLabel>
+    <skos:altLabel xml:lang="es">informático</skos:altLabel>
+  </skos:Concept>
+
+</rdf:RDF>

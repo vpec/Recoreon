@@ -1,17 +1,12 @@
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.nio.file.Paths;
 import java.util.Hashtable;
 import java.util.Map.Entry;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
@@ -24,24 +19,12 @@ import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.text.EntityDefinition;
 import org.apache.jena.query.text.TextDatasetFactory;
 import org.apache.jena.query.text.TextIndexConfig;
-import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.riot.RDFDataMgr;
-import org.apache.jena.tdb2.TDB2Factory;
-import org.apache.jena.util.FileManager;
-import org.apache.jena.vocabulary.DCTerms;
-import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.apache.lucene.analysis.es.SpanishAnalyzer;
 import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.MMapDirectory;
 import org.apache.lucene.store.RAMDirectory;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 public class SemanticSearcher {
 	
@@ -55,7 +38,7 @@ public class SemanticSearcher {
 		String rdfPath = null,  infoNeedsPath = null, resultsPath = null;
 	
 		
-		// Check the number of parameters of the programm
+		// Check the number of parameters of the program
 		if (args.length != NUMBER_PARAMETERS) {
 			System.err.println("Wrong amount of parameters");
 			System.exit(1);
@@ -96,31 +79,37 @@ public class SemanticSearcher {
 		String startingString = "oai_zaguan.unizar.es_";
 		String endingString = ".xml";
 		
-		
-		// Load model
+		// Define properties
 		Property titulo = ResourceFactory.createProperty("http://github.com/vpec/Recoreon/", "titulo");
 		Property descripcion = ResourceFactory.createProperty("http://github.com/vpec/Recoreon/", "descripcion");
 		
-		//definimos la configuración del repositorio indexado
+		// Repository configuration
 		EntityDefinition entDef = new EntityDefinition("uri", "titulo", titulo);
+		// Create index on titles
+		entDef.set("titulo", titulo.asNode());
+		// Create index on descriptions
 		entDef.set("descripcion", descripcion.asNode());
+		// Repository configuration
 		TextIndexConfig config = new TextIndexConfig(entDef);
-//	    config.setAnalyzer(new SpanishAnalyzer());
-//	    config.setQueryAnalyzer(new SpanishAnalyzer());
+	    config.setAnalyzer(new SpanishAnalyzer());
+	    config.setQueryAnalyzer(new SpanishAnalyzer());
+	    config.setMultilingualSupport(true);
 	    
-	    //definimos el repositorio indexado todo en memoria
+	    // Define in-memory index
 	    Dataset ds1 = DatasetFactory.createGeneral() ;
 	    Directory dir =  new RAMDirectory();
 	    Dataset ds = TextDatasetFactory.createLucene(ds1, dir, config) ;
 		
-	    // cargamos el fichero deseado y lo almacenamos en el repositorio indexado	  
+	    // Load file and store it in created index  
         RDFDataMgr.read(ds.getDefaultModel(), rdfPath) ;
 		
 		try {
+			// Prepare results' file to write
 			FileWriter fileWriter = new FileWriter(resultsPath);
 			PrintWriter printWriter = new PrintWriter(fileWriter);		    
 			
 			for(Entry<String, String> entry : infoNeeds.entrySet()) {
+				// Execute queries
 				Query query = QueryFactory.create(entry.getValue());
 				QueryExecution qexec = QueryExecutionFactory.create(query, ds);
 				try {
@@ -130,6 +119,7 @@ public class SemanticSearcher {
 				      if(soln.getResource("uriDoc") != null) {
 				    	  String uriDoc = soln.getResource("uriDoc").getURI();
 					      String[] parts = uriDoc.split("/");
+					      // Write result to file
 					      printWriter.println(entry.getKey() + " " + startingString + parts[parts.length - 1] + endingString);
 				      }
 				    }

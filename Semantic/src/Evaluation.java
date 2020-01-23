@@ -11,8 +11,6 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
-import javax.swing.text.html.HTMLDocument.Iterator;
-
 public class Evaluation {
 	
 	// Hashmap that stores the judgments of relevance

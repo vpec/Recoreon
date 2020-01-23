@@ -3,20 +3,12 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.Hashtable;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.apache.lucene.analysis.StopwordAnalyzerBase;
-import org.apache.commons.io.FileUtils;
 import org.apache.jena.datatypes.xsd.XSDDatatype;
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.ReadWrite;
-import org.apache.jena.query.text.EntityDefinition;
-import org.apache.jena.query.text.TextDatasetFactory;
-import org.apache.jena.query.text.TextIndexConfig;
 import org.apache.jena.rdf.model.InfModel;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
@@ -24,40 +16,10 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
-import org.apache.jena.riot.RDFDataMgr;
-import org.apache.jena.tdb2.TDB2Factory;
 import org.apache.jena.util.FileManager;
-import org.apache.jena.util.ResourceUtils;
-import org.apache.jena.vocabulary.DCTerms;
 import org.apache.jena.vocabulary.RDF;
-import org.apache.lucene.analysis.en.EnglishAnalyzer;
-import org.apache.lucene.analysis.es.SpanishAnalyzer;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.MMapDirectory;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-import java.io.File;
-import java.nio.file.Paths;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ReadWrite;
-import org.apache.jena.query.ResultSet;
-import org.apache.jena.query.text.EntityDefinition;
-import org.apache.jena.query.text.TextDatasetFactory;
-import org.apache.jena.query.text.TextIndexConfig;
-import org.apache.jena.rdf.model.ResourceFactory;
-import org.apache.jena.riot.RDFDataMgr;
-import org.apache.jena.tdb2.TDB2Factory;
-import org.apache.jena.vocabulary.DCTerms;
-import org.apache.lucene.analysis.en.EnglishAnalyzer;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.MMapDirectory;
 
 import openllet.jena.PelletReasonerFactory;
 
@@ -169,16 +131,14 @@ public class SemanticGenerator {
 				}
 			}
 			
-			// Creation of the properties of the model
+			// Define prefixes strings
 			String prefix_skos = "http://github.com/vpec/Recoreon/skos#";
-	        String prefix_rdf = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
-	        String prefix_rdfs = "http://www.w3.org/2000/01/rdf-schema#";
 	        String prefix_m = "http://github.com/vpec/Recoreon/";
-	        String prefix_xsd = "http://www.w3.org/2001/XMLSchema#";
 			
 	        // Access owl model
 	        Model model = FileManager.get().loadModel(owlPath);
 	        
+	        // Add skos terms to model
 	        Model modelSkos = FileManager.get().loadModel(skosPath);
 	        model.add(modelSkos);
 	        
@@ -188,11 +148,10 @@ public class SemanticGenerator {
 			// Directory where the documents of the corpus are allocated
 			File corpus = new File(docsPath);
 			
-			
-			
+			// Set namespace prefix
 			model.setNsPrefix("m", prefix_m);
 			
-	     	Property type = ResourceFactory.createProperty(prefix_rdf, "type");
+			// Define properties
 	     	Property nombrePersona = ResourceFactory.createProperty(prefix_m, "nombrePersona");
 	     	Property nombreOrganizacion = ResourceFactory.createProperty(prefix_m, "nombreOrganizacion");
 	     	Property creador = ResourceFactory.createProperty(prefix_m, "creador");
@@ -207,9 +166,7 @@ public class SemanticGenerator {
 	     	Property derechos = ResourceFactory.createProperty(prefix_m, "derechos");
 	     	
 	     	
-	     	String string;
 	     	for (String docPath : corpus.list()) {
-	     		string = docPath;
 	     		// Reading Flows
 		     	FileInputStream fis;
 		        try {
@@ -232,7 +189,7 @@ public class SemanticGenerator {
 			                  
 			                  nodes = document.getElementsByTagName("dc:title");
 			                  if(nodes.getLength() > 0) {
-							      // Add identifier property to the resource 						
+							      // Add title property to the resource 						
 				                  docResource.addProperty(titulo, nodes.item(0).getTextContent());
 				                  addTopics(docResource, nodes.item(0).getTextContent(), tema);
 			                  }
@@ -273,6 +230,7 @@ public class SemanticGenerator {
 				                
 				             nodes = document.getElementsByTagName("dc:description");
 				             if(nodes.getLength() > 0) {
+				            	// Add description property to the resource 	
 				            	 docResource.addProperty(descripcion, nodes.item(0).getTextContent());
 				            	 addTopics(docResource, nodes.item(0).getTextContent(), tema);
 				             }
@@ -308,11 +266,11 @@ public class SemanticGenerator {
 				             if(nodes.getLength() > 0) {
 					             Literal languageLiteral;
 			                	 if (nodes.item(0).getTextContent().equals("spa")) {
-			                		 // Documents in spanish language
+			                		 // Documents in Spanish language
 			                    	 languageLiteral = model.createTypedLiteral("es", XSDDatatype.XSDlanguage);
 			                	 }
 			                	 else {
-			                		 // Documents in english language
+			                		 // Documents in English language
 			                    	 languageLiteral = model.createTypedLiteral("en", XSDDatatype.XSDlanguage);
 			                	 }
 			                	 // Added language of the document
@@ -339,13 +297,11 @@ public class SemanticGenerator {
 		        }
 			}
 			
-	     	//creamos un modelo de inferencia OWL2
+	     	// Create OWL2 inference model
 			InfModel inf = ModelFactory.createInfModel(PelletReasonerFactory.theInstance().create(), model);
-//	     	InfModel inf = ModelFactory.createRDFSModel(model);
 	     	model.add(inf);
 	     	
-	     	//lo guardamos en un fichero rdf en formato xml
-//			model.write(new FileOutputStream(new File(rdfPath)), "RDF/XML-ABBREV");
+	     	// Write model in XML syntax
 			model.write(new FileOutputStream(new File(rdfPath)));
 			
 			System.out.println("END OF PROGRAM");
