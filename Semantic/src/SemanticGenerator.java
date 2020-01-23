@@ -266,7 +266,7 @@ public class SemanticGenerator {
 			                	// Added the publisher of the document
 				                     docResource.addProperty(publicador, 
 				                    	 model.createResource()
-				                    	 	  .addProperty(RDF.type, ResourceFactory.createResource(prefix_m + "Organización"))
+				                    	 	  .addProperty(RDF.type, ResourceFactory.createResource(prefix_m + "Organizacion"))
 				                    	 	  .addProperty(nombreOrganizacion, nodes.item(0).getTextContent()));
 			                  }
 				              
