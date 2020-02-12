@@ -11,6 +11,10 @@
 
 &nbsp;
 
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) 
+[![Eclipse](https://img.shields.io/badge/IDE%20-Eclipse-ffa033.svg)](https://www.eclipse.org/) 
+[![Language](https://img.shields.io/badge/Language%20-Java-ff3372.svg)](https://www.java.com/es/download/)
+
 # 1. Description
 
 This repository contains different **information retrieval systems** proposed for a small information retrieval competition, 
