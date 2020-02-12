@@ -57,6 +57,10 @@ The traditional information retrieval system designed has the following architec
 * **CustomSpanishAnalyzer**: class that serves as a tool for the analysis of queries and documents by the query processor 
    and the document indexer, respectively. 
    
+Additionally there is one more class, called DefaultSetFolder, which is a static class hosted within the CustomSpanishAnalyzer 
+class. This class is in charge of atomically loading the content of the stop words file the first time it is used by the 
+CustomSpanishAnalyzer class.
+   
 The following image shows the class diagram 
 
 <p align="center">
