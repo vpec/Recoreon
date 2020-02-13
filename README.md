@@ -76,7 +76,7 @@ with detail. This files is **Informe_Sistema_Recuperación_Tradicional_Grupo04.p
 
 &nbsp;
 
-# 2. Semantic information retrieval system
+# 3. Semantic information retrieval system
 
 In order to implement the semantic information retrieval system, the following steps have been realised:
 
@@ -106,7 +106,7 @@ compared in order to verify which of them was better.
 
 &nbsp;
 
-# 3. Evaluation
+# 4. Evaluation
 
 In order to evaluate the information retrieval systems an evaluation system based on the following metrics has been implemented:
 
@@ -134,10 +134,10 @@ Aditionally, the following global measures have be displayed:
 
 &nbsp;
 
-# 4. Authors
+# 5. Authors
 
-* [Victor Peñasco](https://github.com/vpec) - 741294
-* [Rubén Rodríguez](https://github.com/ZgzInfinity) - 737215
+* [Victor Peñasco](https://github.com/vpec) - 741294@unizar.es
+* [Rubén Rodríguez](https://github.com/ZgzInfinity) - 737215@unizar.es
 
 
 
