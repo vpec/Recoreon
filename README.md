@@ -93,7 +93,7 @@ Later this model was used to generate the rdfs network that represents the Zagua
 in the file named **graph04.xml**. This graph is represented in XML format.
 
 After that, in order to take advantage of the semantic search, a terminological model that describe the terms used to describe 
-the resources was created. This terminological model was designed following the **skos shcema**. This model provided a hierarchy
+the resources was created. This terminological model was designed following the **skos schema**. This model provided a hierarchy
 of the terms used in the queries, synonyms, and other terms also used in the metadata of the collection that could be considered
 as specializations of the terms of the queries and allow to improve the exhaustiveness of the search. The skos model can be 
 found in the file **skos04.xml**. 
